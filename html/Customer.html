@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Customer</title>
+<link rel="stylesheet" type="text/css" href="view.css" media="all">
+<script type="text/javascript" src="view.js"></script>
+
+</head>
+<body id="main_body" >
+	
+	<img id="top" src="top.png" alt="">
+	<div id="form_container">
+	
+		<h1><a>Customer</a></h1>
+		<form class="appnitro"  method="post" action="">
+		<div class="form_description">
+			<h2>Customer</h2>
+			<p>Customer options.</p>
+		</div>						
+		<ul>
+		
+		<li class="section_break">
+			<h3>Find Event - Search by any category (OR'd together)</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Event City: <br> <input type="text" name="eventCity"><br>
+			OR Event Name: <br> <input type="text" name="eventName"><br>
+			OR Event Month/Year: 
+			<li>
+				<span>
+					<input name="eventYear" class="element text " size="2" type="text" maxlength="2" value=""/>
+					<label>YY</label>
+				</span>
+				<span>
+					<input name="eventMonth" class="element text " size="2" type="text" maxlength="2" value=""/>
+					<label>MM</label>
+				</span>
+			</li>
+			
+			<input type="submit" value="Find">
+		</form>
+		
+		<li class="section_break">
+			<h3>Find Open Sections For Event</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Event (ID): <br> <input type="text" name="eventID"><br>
+			<input type="submit" value="Find">
+		</form>
+		
+		<li class="section_break">
+			<h3>Find Open Seats For Event</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Event (ID): <br> <input type="text" name="eventID"><br>
+			<input type="submit" value="Find">
+		</form>
+		
+		<li class="section_break">
+			<h3>View Purchased Tickets</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			<input type="submit" value="View">
+		</form>
+		
+		<li class="section_break">
+			<h3>Purchase Ticket</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Event (ID): <br> <input type="text" name="eventID"><br>
+			Seat Section (ID): <br> <input type="text" name="seatSectionID"><br>
+			Row: <br> <input type="text" name="row"><br>
+			seatNo: <br> <input type="text" name="seatNo"><br>
+			<input type="submit" value="Purchase">
+		</form>
+		
+		<li class="section_break">
+			<h3>View Most Popular Venues</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Number Venues: <br> <input type="text" name="numVenues"><br>
+			<input type="submit" value="Submit">
+		</form>
+		
+		<li class="section_break">
+			<h3>View Most Popular Events</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Number Events: <br> <input type="text" name="numVenues"><br>
+			<input type="submit" value="Submit">
+		</form>
+		
+		<li class="section_break">
+			<h3>Delete My Account</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Submit to delete. Are you sure?? <input type="submit" value="Submit">
+		</form>
+		
+		<br><br><a href="loginForm.html">logout</a>
+
+		</ul>
+		</form>	
+		<div id="footer">
+			Project By Ricky, Jeremy, Gorden & Jorden
+		</div>
+	</div>
+	<img id="bottom" src="bottom.png" alt="">
+	</body>
+</html>

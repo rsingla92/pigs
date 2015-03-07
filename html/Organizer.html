@@ -1,0 +1,293 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Organizer</title>
+<link rel="stylesheet" type="text/css" href="view.css" media="all">
+<script type="text/javascript" src="view.js"></script>
+
+</head>
+<body id="main_body" >
+	
+	<img id="top" src="top.png" alt="">
+	<div id="form_container">
+	
+		<h1><a>Organizer</a></h1>
+		<form class="appnitro"  action="">
+		<div class="form_description">
+			<h2>Organizer</h2>
+			<p>Organizer options.</p>
+		</div>						
+		<ul >
+			
+		<li class="section_break">
+			<h3>New Event</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			At Venue (id): <br> <input type="text" name="venueID"><br>
+			Event Name: <br> <input type="text" name="name"><br>
+			Base Price: <br> <input type="text" name="basePrice"><br>
+			
+		<li>
+			<label class="description">Start Time </label>
+			<span>
+				<input name="startTimeYear" class="element text " size="2" type="text" maxlength="2" value=""/>
+				<label>YY</label>
+			</span>
+			<span>
+				<input name="startTimeMonth" class="element text " size="2" type="text" maxlength="2" value=""/>
+				<label>MMonth</label>
+			</span>
+			<span>
+				<input name="startTimeDay" class="element text " size="2" type="text" maxlength="2" value=""/> - 
+				<label>DD</label>
+			</span>
+			<span>
+				<input name="startTimeHour" class="element text " size="2" type="text" maxlength="2" value=""/> : 
+				<label>HH</label>
+			</span>
+			<span>
+				<input name="startTimeMinute" class="element text " size="2" type="text" maxlength="2" value=""/> : 
+				<label>MMin</label>
+			</span>
+			<span>
+				<select name="startTimeSel" class="element select" style="width:4em">
+					<option value="AM" >AM</option>
+					<option value="PM" >PM</option>
+				</select>
+				<label>AM/PM</label>
+			</span> 
+		</li>			
+			
+		<li>
+			<label class="description">End Time </label>
+			<span>
+				<input name="endTimeYear" class="element text " size="2" type="text" maxlength="2" value=""/>
+				<label>YY</label>
+			</span>
+			<span>
+				<input name="endTimeMonth" class="element text " size="2" type="text" maxlength="2" value=""/>
+				<label>MMonth</label>
+			</span>
+			<span>
+				<input name="endTimeDay" class="element text " size="2" type="text" maxlength="2" value=""/> - 
+				<label>DD</label>
+			</span>
+			<span>
+				<input name="endTimeHour" class="element text " size="2" type="text" maxlength="2" value=""/> : 
+				<label>HH</label>
+			</span>
+			<span>
+				<input name="endTimeMinute" class="element text " size="2" type="text" maxlength="2" value=""/> : 
+				<label>MMin</label>
+			</span>
+			<span>
+				<select name="endTimeSel" class="element select" style="width:4em">
+					<option value="AM" >AM</option>
+					<option value="PM" >PM</option>
+				</select>
+				<label>AM/PM</label>
+			</span> 
+		</li>
+		
+		<li>
+			<label class="description">Sale Open Time </label>
+			<span>
+				<input name="saleOpenTimeYear" class="element text " size="2" type="text" maxlength="2" value=""/>
+				<label>YY</label>
+			</span>
+			<span>
+				<input name="saleOpenTimeMonth" class="element text " size="2" type="text" maxlength="2" value=""/>
+				<label>MMonth</label>
+			</span>
+			<span>
+				<input name="saleOpenTimeDay" class="element text " size="2" type="text" maxlength="2" value=""/> - 
+				<label>DD</label>
+			</span>
+			<span>
+				<input name="saleOpenTimeHour" class="element text " size="2" type="text" maxlength="2" value=""/> : 
+				<label>HH</label>
+			</span>
+			<span>
+				<input name="saleOpenTimeMinute" class="element text " size="2" type="text" maxlength="2" value=""/> : 
+				<label>MMin</label>
+			</span>
+			<span>
+				<select name="saleOpenTimeSel" class="element select" style="width:4em">
+					<option value="AM" >AM</option>
+					<option value="PM" >PM</option>
+				</select>
+				<label>AM/PM</label>
+			</span> 
+		</li>
+		<input type="submit" value="Submit">
+		</form>
+		
+		<li class="section_break">
+			<h3>New Venue</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Venue Name: <br> <input type="text" name="name"><br>
+			Address: <br> <input type="text" name="address"><br>
+			City: <br> <input type="text" name="city"><br>
+			Province: <br> <input type="text" name="province"><br>
+			<input type="submit" value="Submit">
+		</form>
+		
+		<li class="section_break">
+			<h3>New Seating Section</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Additional Price: <br> <input type="text" name="additionalPrice"><br>
+			Seats Available: <br> <input type="text" name="seatsAvailable"><br>
+			<label class="description" for="element_9">Section Type:</label>
+			<select class="element select medium" id="element_8" name="userType"> 
+				<option value="" selected="selected"></option>
+				<option value="1" >General admission</option>
+				<option value="2" >Lower section</option>
+				<option value="3" >Upper Section</option>
+				<option value="4" >Box Section</option>
+			</select>
+			
+			For Venue (ID): <br> <input type="text" name="venueID"><br>
+			<input type="submit" value="Submit">
+		</form>
+		
+		<li class="section_break">
+			<h3>New Seat</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Row: <br> <input type="text" name="row"><br>
+			seatNo: <br> <input type="text" name="seatNo"><br>
+			For Section (ID): <br> <input type="text" name="sectionID"><br>
+			For Venue (ID): <br> <input type="text" name="venueID"><br>
+			<input type="submit" value="Submit">
+		</form>
+		
+		<li class="section_break">
+			<h3>Delete Event</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Event (ID): <br> <input type="text" name="eventID"><br>
+			<input type="submit" value="Delete">
+		</form>
+		
+		<li class="section_break">
+			<h3>Delete Venue</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Venue (ID): <br> <input type="text" name="venueID"><br>
+			<input type="submit" value="Delete">
+		</form>
+		
+		<li class="section_break">
+			<h3>Delete Seat Section</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Section (ID): <br> <input type="text" name="sectionID"><br>
+			<input type="submit" value="Delete">
+		</form>
+		
+		<li class="section_break">
+			<h3>Delete Seat</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Seat Row: <br> <input type="text" name="row"><br>
+			Seat Number: <br> <input type="text" name="seatNo"><br>
+			<input type="submit" value="Delete">
+		</form>
+		
+		<li class="section_break">
+			<h3>Start Ticket Sales</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Event (ID): <br> <input type="text" name="eventID"><br>
+			<input type="submit" value="Submit">
+		</form>
+		
+		<li class="section_break">
+			<h3>View All Events</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			<input type="submit" value="Submit">
+		</form>
+		
+		<li class="section_break">
+			<h3>View All Venues</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			<input type="submit" value="Submit">
+		</form>
+		
+		<li class="section_break">
+			<h3>View All Sections</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			<input type="submit" value="Submit">
+		</form>
+		
+		<li class="section_break">
+			<h3>View All Seats</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			<input type="submit" value="Submit">
+		</form>
+		
+		<li class="section_break">
+			<h3>View Purchased Seats</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			<input type="submit" value="Submit">
+		</form>
+		
+		<li class="section_break">
+			<h3>View Most Popular Venues</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Number Venues: <br> <input type="text" name="numVenues"><br>
+			<input type="submit" value="Submit">
+		</form>
+		
+		<li class="section_break">
+			<h3>View Most Popular Events</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Number Events: <br> <input type="text" name="numVenues"><br>
+			<input type="submit" value="Submit">
+		</form>
+		
+		<li class="section_break">
+			<h3>Delete My Account</h3>
+			<p></p>
+		</li>
+		<form method="post" action="">
+			Submit to delete. Are you sure?? <input type="submit" value="Submit">
+		</form>
+		
+		<br><br><a href="loginForm.html">logout</a>
+		
+		</ul>
+		</form>	
+		<div id="footer">
+			Project By Ricky, Jeremy, Gorden & Jorden
+		</div>
+	</div>
+	<img id="bottom" src="bottom.png" alt="">
+	</body>
+</html>
