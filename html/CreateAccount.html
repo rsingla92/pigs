@@ -13,7 +13,7 @@
 	<div id="form_container">
 	
 		<h1><a>New Account</a></h1>
-		<form id="form_980924" class="appnitro"  method="post" action="">
+		<form id="form_980924" class="appnitro"  method="post" action="./register.php">
 					<div class="form_description">
 			<h2>New Account</h2>
 		</div>						
@@ -24,15 +24,15 @@
 			<p></p>
 		</li>		
 		
-		<form action="">
+		<form action="./register.php" method="post">
 			<li>
 				<label class="description" for="element_7">Name </label>
 				<span>
-					<input id="element_7_1" name= "element_7_1" class="element text" maxlength="255" size="8" value=""/>
+					<input id="first_name" name= "first_name" class="element text" maxlength="255" size="8" value=""/>
 					<label>First</label>
 				</span>
 				<span>
-					<input id="element_7_2" name= "element_7_2" class="element text" maxlength="255" size="14" value=""/>
+					<input id="last_name" name= "last_name" class="element text" maxlength="255" size="14" value=""/>
 					<label>Last</label>
 				</span> 
 			</li>
@@ -41,7 +41,7 @@
 			
 			Username:<br> <input type="text" name="user"><br>
 			Password:<br> <input type="password" name="password"><br>
-			Confirm Password:<br> <input type="password" name="password"><br>
+			Confirm Password:<br> <input type="password" name="password_confirm"><br>
 			
 			<label class="description" for="element_9">User Type</label>
 			<select class="element select medium" id="element_8" name="userType"> 
