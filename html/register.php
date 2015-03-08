@@ -12,17 +12,39 @@
     <div id="form_container">
 	
 <?php
-    $pswd = sha1($_POST["password"]);
-    $pswd_confirm = sha1($_POST["password_confirm"]);
-
-    if (strcmp($pswd, $pswd_confirm) !== 0) 
+    // Validate data 
+    $email = $_POST["email"];
+    $user = $_POST["user"];
+    $first_name = $_POST["first_name"];
+    $last_name = $_POST["last_name"];
+    $user_type = $_POST["userType"];
+    
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL))
     {
-        echo "Your password and confirmed password did not match.";
+        echo "Invalid email supplied.<br>";
+        echo "Click <a href=\"CreateAccount.html\">here<//a> to try again.";
+    }
+    else if ($user === '' || $first_name === '' || $last_name === '' || ($user_type <> 1 && $user_type <> 2))
+    {
+        echo "Invalid input to the registration form.<br>";
+        echo "Click <a href=\"CreateAccount.html\">here<//a> to try again.";
     }
     else
     {
-        echo "Hello, {$_POST['first_name']} {$_POST['last_name']}. You have successfully created an account";
-        // Store data in DB here
+        $pswd = sha1($_POST["password"]);
+        $pswd_confirm = sha1($_POST["password_confirm"]);
+
+        if (strcmp($pswd, $pswd_confirm) !== 0) 
+        {
+            echo "Your password and confirmed password did not match.<br>";
+            echo "Click <a href=\"CreateAccount.html\">here<//a> to try again.";
+        }
+        else
+        {
+            echo "Hello, {$first_name} {$last_name}. You have successfully created an account.<br>";
+            echo "Click <a href=\"loginForm.html\">here<//a> to login.";
+            // Store data in DB here
+        }
     }
 ?>
 </body>
