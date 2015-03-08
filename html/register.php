@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>PIGS Login</title>
+<title>PIGS Registration</title>
 <link rel="stylesheet" type="text/css" href="view.css" media="all">
 <script type="text/javascript" src="view.js"></script>
 
@@ -43,7 +43,7 @@
         {
             echo "Hello, {$first_name} {$last_name}. You have successfully created an account.<br>";
             echo "Click <a href=\"loginForm.html\">here<//a> to login.";
-            // Store data in DB here
+            // TODO: Store data in DB here
         }
     }
 ?>
