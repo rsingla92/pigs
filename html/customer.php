@@ -32,14 +32,139 @@
         echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
     }
 
+    function find_open_sections()
+    {
+        if (isset($_POST['eventID']))
+        {
+            $eventID = $_POST['eventID'];
+           
+            //TODO: Query based on input
+            echo "Open sections for event with ID {$eventID}:<br>";
+            echo "Nothing so far! Haven't added queries!<br>";
+        }
+        else
+        {
+            echo "Did not receive an eventID with request.<br>";
+        }
+
+        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+    }
+
+    function find_open_seats()
+    {
+        if (isset($_POST['eventID']))
+        {
+            $eventID = $_POST['eventID'];
+           
+            //TODO: Query based on input
+            echo "Open seats for event with ID {$eventID}:<br>";
+            echo "Nothing so far! Haven't added queries!<br>";
+        }
+        else
+        {
+            echo "Did not receive an eventID with request.<br>";
+        }
+
+        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+    }
+
+    function view_purchased_tickets()
+    {
+        // TODO: Query to find purchased tickets
+        echo "Purchased tickets for customer with username {$_SESSION['login_user']}:<br>";
+        echo "None so far! Haven't added queries!<br>";
+        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+    }
+
+    function purchase_ticket()
+    {
+        if (isset($_POST['eventID']) && isset($_POST['seatSectionID']) && isset($_POST['row'])
+              && isset($_POST['seatNo']))
+        {
+            $eventID = $_POST['eventID'];
+            $seatSectionID = $_POST['seatSectionID'];
+            $row = $_POST['row'];
+            $seatNo = $_POST['seatNo'];
+
+            // TODO: Write query to purchase tickets.
+            echo "Purchased ticket for event with ID {$eventID}. You are in section {$seatSectionID} with row {$row} and seat {$seatNo}.<br>";
+        }
+        else
+        {
+            echo "Did not receive the expected input for purchasing tickets.<br>";
+        }
+
+        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+    }
+
+    function most_popular_venues()
+    {
+        if (isset($_POST['numVenues']))
+        {
+            // TODO: Add query
+            echo "List of {$_POST['numVenues']} most popular venue(s):<br>";
+            echo "Nothing so far! Must add query.<br>";
+        }
+        else
+        {
+            echo "Did not receive the number of venues to return.<br>";
+        }
+
+        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+    }
+
+    function most_popular_events()
+    {
+        if (isset($_POST['numEvents']))
+        {
+            // TODO: Add query
+            echo "List of {$_POST['numEvents']} most popular event(s):<br>";
+            echo "Nothing so far! Must add query.<br>";
+        }
+        else
+        {
+            echo "Did not receive the number of events to return.<br>";
+        }
+
+        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+    }
+
+    function delete_account()
+    {
+        echo "Deleted user {$_SESSION['login_user']}.<br>";
+        unset($_SESSION['login_user']);
+        session_destroy();
+    }
+
     $action_num = intval(get_post_default('action', '0'));
     if ($action_num >= 1 && $action_num <= 8)
     {
-        echo "Action num: {$action_num}<br>";
+        echo "Action num: {$action_num}.<br>";
         switch ($action_num)
         {
             case 1:
                 find_event();
+                break;
+            case 2:
+                find_open_sections();
+                break;
+            case 3:
+                find_open_seats();
+                break;
+            case 4:
+                view_purchased_tickets();
+                break;
+            case 5:
+                purchase_ticket();
+                break;
+            case 6:
+                most_popular_venues();
+                break;
+            case 7:
+                most_popular_events();
+                break;
+            case 8:
+                delete_account();
                 break;
             default:
                 echo "Invalid operation.<br>";
