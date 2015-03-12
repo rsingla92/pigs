@@ -13,7 +13,7 @@
 	<div id="form_container">
 	
 		<h1><a>Customer</a></h1>
-		<form class="appnitro"  method="post" action="">
+		<form class="appnitro"  method="post" action="customer.php">
 		<div class="form_description">
 			<h2>Customer</h2>
 			<p>Customer options.</p>
@@ -24,7 +24,7 @@
 			<h3>Find Event - Search by any category (OR'd together)</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="customer.php">
 			Event City: <br> <input type="text" name="eventCity"><br>
 			OR Event Name: <br> <input type="text" name="eventName"><br>
 			OR Event Month/Year: 
@@ -38,7 +38,7 @@
 					<label>MM</label>
 				</span>
 			</li>
-			
+		        <input type="hidden" name="action" value="1">	
 			<input type="submit" value="Find">
 		</form>
 		
@@ -46,8 +46,9 @@
 			<h3>Find Open Sections For Event</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="customer.php">
 			Event (ID): <br> <input type="text" name="eventID"><br>
+		        <input type="hidden" name="action" value="2">	
 			<input type="submit" value="Find">
 		</form>
 		
@@ -55,8 +56,9 @@
 			<h3>Find Open Seats For Event</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="customer.php">
 			Event (ID): <br> <input type="text" name="eventID"><br>
+		        <input type="hidden" name="action" value="3">	
 			<input type="submit" value="Find">
 		</form>
 		
@@ -64,7 +66,8 @@
 			<h3>View Purchased Tickets</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="customer.php">
+		        <input type="hidden" name="action" value="4">	
 			<input type="submit" value="View">
 		</form>
 		
@@ -72,11 +75,12 @@
 			<h3>Purchase Ticket</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="customer.php">
 			Event (ID): <br> <input type="text" name="eventID"><br>
 			Seat Section (ID): <br> <input type="text" name="seatSectionID"><br>
 			Row: <br> <input type="text" name="row"><br>
 			seatNo: <br> <input type="text" name="seatNo"><br>
+		        <input type="hidden" name="action" value="5">	
 			<input type="submit" value="Purchase">
 		</form>
 		
@@ -84,8 +88,9 @@
 			<h3>View Most Popular Venues</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="customer.php">
 			Number Venues: <br> <input type="text" name="numVenues"><br>
+		        <input type="hidden" name="action" value="6">	
 			<input type="submit" value="Submit">
 		</form>
 		
@@ -93,8 +98,9 @@
 			<h3>View Most Popular Events</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
-			Number Events: <br> <input type="text" name="numVenues"><br>
+		<form method="post" action="customer.php">
+			Number Events: <br> <input type="text" name="numEvents"><br>
+		        <input type="hidden" name="action" value="7">	
 			<input type="submit" value="Submit">
 		</form>
 		
@@ -102,7 +108,8 @@
 			<h3>Delete My Account</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="customer.php">
+		        <input type="hidden" name="action" value="8">	
 			Submit to delete. Are you sure?? <input type="submit" value="Submit">
 		</form>
 		
