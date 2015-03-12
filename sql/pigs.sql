@@ -14,14 +14,14 @@ drop table ForAdmissionTo CASCADE CONSTRAINTS;
 -- Create tables with their constraints
 CREATE TABLE Venue (venueID INT , name VARCHAR(255), address VARCHAR(255), cityName VARCHAR(255), provName VARCHAR(255), PRIMARY KEY (venueID), UNIQUE (address, cityName, provName));
 CREATE TABLE Event_atVenue (venueID INT, eventID INT, basePrice INT, saleOpenDate TIMESTAMP, ticketStatus VARCHAR(255), startTime TIMESTAMP, endTime TIMESTAMP, PRIMARY KEY(eventID), UNIQUE (startTime, endTime, venueID));
-ALTER TABLE Event_atVenue ADD CONSTRAINT fkv FOREIGN KEY (venueID) REFERENCES Venue (venueID) ON DELETE SET NULL;
-CREATE TABLE SeatingSection_inVenue (venueID INT, sectionID INT NOT NULL , additionalPrice INT, seatsAvailable INT NOT NULL, sectionSectionType INT NOT NULL, PRIMARY KEY (sectionID, venueID), FOREIGN KEY(venueID) REFERENCES Venue  ON DELETE CASCADE);
-CREATE TABLE Seat_inSection (sectionID INT, venueID INT, seat_row INT, seatNo INT, PRIMARY KEY (sectionID, venueID, seat_row, seatNo), FOREIGN KEY (sectionID, venueID) REFERENCES SeatingSection_inVenue(sectionID, venueID) ON DELETE CASCADE);
-CREATE TABLE Ticket_ownsSeat (ticketID INT, isAvailable CHAR, sectionID INT, venueID INT, seat_row INT, seatNo INT, PRIMARY KEY (ticketID), FOREIGN KEY (sectionID, venueID) REFERENCES SeatingSection_inVenue(sectionID, venueID) ON DELETE CASCADE, FOREIGN KEY (sectionID, venueID, seat_row, seatNo) REFERENCES Seat_inSection(sectionID, venueID, seat_row, seatNo) ON DELETE CASCADE);
+--ALTER TABLE Event_atVenue ADD CONSTRAINT fkv FOREIGN KEY (venueID) REFERENCES Venue (venueID) ON DELETE SET NULL;
+CREATE TABLE SeatingSection_inVenue (venueID INT, sectionID INT NOT NULL , additionalPrice INT, seatsAvailable INT NOT NULL, sectionSectionType INT NOT NULL, PRIMARY KEY (sectionID, venueID));
+CREATE TABLE Seat_inSection (sectionID INT, venueID INT, seat_row INT, seatNo INT, PRIMARY KEY (sectionID, venueID, seat_row, seatNo));
+CREATE TABLE Ticket_ownsSeat (ticketID INT, isAvailable CHAR, sectionID INT, venueID INT, seat_row INT, seatNo INT, PRIMARY KEY (ticketID));
 CREATE TABLE Customer (userID INT, firstName VARCHAR(255), lastName VARCHAR(255), email VARCHAR(255), username VARCHAR(255), password VARCHAR(255), PRIMARY KEY(userID), UNIQUE(email), UNIQUE(username));
 CREATE TABLE Organizer (organizerID INT, firstName VARCHAR(255) NOT NULL, lastName VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, username VARCHAR(255), password VARCHAR(255), PRIMARY KEY(organizerID), UNIQUE(username), UNIQUE(email));
-CREATE TABLE Organizes (organizerID INT, eventID INT, PRIMARY KEY(organizerID, eventID), FOREIGN KEY(organizerID) REFERENCES Organizer(organizerID), FOREIGN KEY(eventID) REFERENCES Event_atVenue(eventID));
-CREATE TABLE ForAdmissionTo(eventID INT, ticketID INT, PRIMARY KEY(eventID, ticketID), FOREIGN KEY(eventID) REFERENCES Event_atVenue(eventID), FOREIGN KEY(ticketID) REFERENCES Ticket_ownsSeat(ticketID)  ON DELETE CASCADE);
+CREATE TABLE Organizes (organizerID INT, eventID INT, PRIMARY KEY(organizerID, eventID));
+CREATE TABLE ForAdmissionTo(eventID INT, ticketID INT, PRIMARY KEY(eventID, ticketID));
 
 -- Add mock data
 COMMIT;
@@ -136,45 +136,48 @@ INSERT INTO ticket_ownsseat (ticketID, isAvailable, sectionID, venueID, seat_row
 COMMIT;
 END;
 
--- --
--- -- Constraints for dumped tables
--- --
 --
--- --
--- -- Constraints for table event_atvenue
--- --
--- ALTER TABLE event_atvenue
--- ADD CONSTRAINT event_atvenue_ibfk_1 FOREIGN KEY (venueID) REFERENCES venue (venueID) ON DELETE SET NULL ON UPDATE NO ACTION;
+-- Constraints for dumped tables
 --
--- --
--- -- Constraints for table foradmissionto
--- --
--- ALTER TABLE foradmissionto
--- ADD CONSTRAINT foradmissionto_ibfk_1 FOREIGN KEY (eventID) REFERENCES event_atvenue (eventID) ON DELETE NO ACTION ON UPDATE NO ACTION;
--- ADD CONSTRAINT foradmissionto_ibfk_2 FOREIGN KEY (ticketID) REFERENCES ticket_ownsseat (ticketID) ON DELETE CASCADE ON UPDATE CASCADE;
+
 --
--- --
--- -- Constraints for table organizes
--- --
--- ALTER TABLE organizes
--- ADD CONSTRAINT organizes_ibfk_1 FOREIGN KEY (organizerID) REFERENCES organizer (organizerID) ON DELETE NO ACTION ON UPDATE NO ACTION;
--- ADD CONSTRAINT organizes_ibfk_2 FOREIGN KEY (eventID) REFERENCES event_atvenue (eventID) ON DELETE NO ACTION ON UPDATE NO ACTION;
+-- Constraints for table event_atvenue
 --
--- --
--- -- Constraints for table seatingsection_invenue
--- --
--- ALTER TABLE seatingsection_invenue
--- ADD CONSTRAINT seatingsection_invenue_ibfk_1 FOREIGN KEY (venueID) REFERENCES venue (venueID) ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE event_atvenue -
+ADD CONSTRAINT event_atvenue_ibfk_1 FOREIGN KEY (venueID) REFERENCES venue (venueID) ON DELETE SET NULL;
+
 --
--- --
--- -- Constraints for table seat_insection
--- --
--- ALTER TABLE seat_insection
--- ADD CONSTRAINT seat_insection_ibfk_1 FOREIGN KEY (sectionID, venueID) REFERENCES seatingsection_invenue (sectionID, venueID) ON DELETE CASCADE ON UPDATE NO ACTION;
+-- Constraints for table foradmissionto
 --
--- --
--- -- Constraints for table ticket_ownsseat
--- --
--- ALTER TABLE ticket_ownsseat
--- ADD CONSTRAINT ticket_ownsseat_ibfk_1 FOREIGN KEY (sectionID, venueID) REFERENCES seatingsection_invenue (sectionID, venueID) ON DELETE CASCADE ON UPDATE NO ACTION;
--- ADD CONSTRAINT ticket_ownsseat_ibfk_2 FOREIGN KEY (sectionID, venueID, seat_row, seatNo) REFERENCES seat_insection (sectionID, venueID, seat_row, seatNo) ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE foradmissionto -
+ADD CONSTRAINT foradmissionto_ibfk_1 FOREIGN KEY (eventID) REFERENCES event_atvenue (eventID);
+ALTER TABLE foradmissionto -
+ADD CONSTRAINT foradmissionto_ibfk_2 FOREIGN KEY (ticketID) REFERENCES ticket_ownsseat (ticketID) ON DELETE CASCADE;
+
+--
+-- Constraints for table organizes
+--
+ALTER TABLE organizes -
+ADD CONSTRAINT organizes_ibfk_1 FOREIGN KEY (organizerID) REFERENCES organizer (organizerID);
+ALTER TABLE organizes -
+ADD CONSTRAINT organizes_ibfk_2 FOREIGN KEY (eventID) REFERENCES event_atvenue (eventID);
+
+--
+-- Constraints for table seatingsection_invenue
+--
+ALTER TABLE seatingsection_invenue -
+ADD CONSTRAINT seatingsection_invenue_ibfk_1 FOREIGN KEY (venueID) REFERENCES venue (venueID) ON DELETE CASCADE;
+
+--
+-- Constraints for table seat_insection
+--
+ALTER TABLE seat_insection -
+ADD CONSTRAINT seat_insection_ibfk_1 FOREIGN KEY (sectionID, venueID) REFERENCES seatingsection_invenue (sectionID, venueID) ON DELETE CASCADE;
+
+--
+-- Constraints for table ticket_ownsseat
+--
+ALTER TABLE ticket_ownsseat -
+ADD CONSTRAINT ticket_ownsseat_ibfk_1 FOREIGN KEY (sectionID, venueID) REFERENCES seatingsection_invenue (sectionID, venueID) ON DELETE CASCADE;
+ALTER TABLE ticket_ownsseat -
+ADD CONSTRAINT ticket_ownsseat_ibfk_2 FOREIGN KEY (sectionID, venueID, seat_row, seatNo) REFERENCES seat_insection (sectionID, venueID, seat_row, seatNo) ON DELETE CASCADE;
