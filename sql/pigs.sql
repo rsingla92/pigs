@@ -5,7 +5,7 @@ drop table Venue CASCADE CONSTRAINTS;
 drop table Event_atVenue CASCADE CONSTRAINTS;
 drop table SeatingSection_inVenue CASCADE CONSTRAINTS;
 drop table Seat_inSection CASCADE CONSTRAINTS;
-drop table Ticket_ownsSeat CASCADE CONSTRAINTS;
+drop table Ticket_ownsSeat_WithCustomer CASCADE CONSTRAINTS;
 drop table Customer CASCADE CONSTRAINTS;
 drop table Organizer CASCADE CONSTRAINTS;
 drop table Organizes CASCADE CONSTRAINTS;
@@ -13,14 +13,23 @@ drop table ForAdmissionTo CASCADE CONSTRAINTS;
 
 -- Create tables with their constraints
 CREATE TABLE Venue (venueID INT , name VARCHAR(255), address VARCHAR(255), cityName VARCHAR(255), provName VARCHAR(255), PRIMARY KEY (venueID), UNIQUE (address, cityName, provName));
-CREATE TABLE Event_atVenue (venueID INT, eventID INT, basePrice INT, saleOpenDate TIMESTAMP, ticketStatus VARCHAR(255), startTime TIMESTAMP, endTime TIMESTAMP, PRIMARY KEY(eventID), UNIQUE (startTime, endTime, venueID));
+
+CREATE TABLE Event_atVenue (venueID INT, eventID INT, eventName VARCHAR(255), basePrice INT, saleOpenDate TIMESTAMP, ticketStatus VARCHAR(255), startTime TIMESTAMP, endTime TIMESTAMP, PRIMARY KEY(eventID), UNIQUE (startTime, endTime, venueID));
 --ALTER TABLE Event_atVenue ADD CONSTRAINT fkv FOREIGN KEY (venueID) REFERENCES Venue (venueID) ON DELETE SET NULL;
+
 CREATE TABLE SeatingSection_inVenue (venueID INT, sectionID INT NOT NULL , additionalPrice INT, seatsAvailable INT NOT NULL, sectionSectionType INT NOT NULL, PRIMARY KEY (sectionID, venueID));
+
 CREATE TABLE Seat_inSection (sectionID INT, venueID INT, seat_row INT, seatNo INT, PRIMARY KEY (sectionID, venueID, seat_row, seatNo));
-CREATE TABLE Ticket_ownsSeat (ticketID INT, isAvailable CHAR, sectionID INT, venueID INT, seat_row INT, seatNo INT, PRIMARY KEY (ticketID));
+
 CREATE TABLE Customer (userID INT, firstName VARCHAR(255), lastName VARCHAR(255), email VARCHAR(255), username VARCHAR(255), password VARCHAR(255), PRIMARY KEY(userID), UNIQUE(email), UNIQUE(username));
+
+CREATE TABLE Ticket_ownsSeat_WithCustomer(ticketID INT, userID INT, isAvailable CHAR, sectionID INT, venueID INT, seat_row INT, seatNo INT, PRIMARY KEY (ticketID));
+--ALTER TABLE Ticket_ownsSeat_WithCustomer ADD CONSTRAINT ticket_ownsseat_ibfk_3 FOREIGN KEY (userID) REFERENCES Customer(userID) ON DELETE SET NULL;
+
 CREATE TABLE Organizer (organizerID INT, firstName VARCHAR(255) NOT NULL, lastName VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, username VARCHAR(255), password VARCHAR(255), PRIMARY KEY(organizerID), UNIQUE(username), UNIQUE(email));
+
 CREATE TABLE Organizes (organizerID INT, eventID INT, PRIMARY KEY(organizerID, eventID));
+
 CREATE TABLE ForAdmissionTo(eventID INT, ticketID INT, PRIMARY KEY(eventID, ticketID));
 
 -- Add mock data
@@ -28,15 +37,15 @@ COMMIT;
 SET TRANSACTION NAME 'mock_data';
 
 INSERT INTO venue (venueID, name, address, cityName, provName) VALUES -
-(1, 'General Motors Place', '123 Fake Road', 'Vancouver', 'BC');
+(1, 'Queen Elizabeth Theatre', '649 Cambie Street', 'Vancouver', 'BC');
 INSERT INTO venue (venueID, name, address, cityName, provName) VALUES -
-(2, 'Rogers Arena', '321 Cool Street', 'Vancouver', 'BC');
+(2, 'Rogers Arena', '800 Griffiths Way', 'Vancouver', 'BC');
 INSERT INTO venue (venueID, name, address, cityName, provName) VALUES -
-(3, 'Saddledome', '456 Awesome Court', 'Calgary', 'AB');
+(3, 'Saddledome', '555 Saddledome Rise SE', 'Calgary', 'AB');
 INSERT INTO venue (venueID, name, address, cityName, provName) VALUES -
-(4, 'BC Place', '789 Sweet Road', 'Vancouver', 'BC');
+(4, 'BC Place', '777 Pacific Boulevard', 'Vancouver', 'BC');
 INSERT INTO venue (venueID, name, address, cityName, provName) VALUES -
-(5, 'Maple Leaf Garden Center', '905 Chill Place', 'Toronto', 'ON');
+(5, 'Air Canada Centre', '40 Bay Street', 'Toronto', 'ON');
 
 INSERT INTO customer (userID, firstName, lastName, email, username, password) VALUES -
 (1, 'Alice', 'Marshall', 'alice@gmail.com', 'alice', 'pswrd');
@@ -50,16 +59,16 @@ INSERT INTO customer (userID, firstName, lastName, email, username, password) VA
 (5, 'Jarett', 'Mitchell', 'jarett@gmail.com', 'jarett', 'muchfun');
 
 
-INSERT INTO event_atvenue (venueID, eventID, basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
-(3, 1, 50, '2014-01-14 11:11:11', 'Open', '2014-04-14 11:11:11', '2014-01-14 23:11:11');
-INSERT INTO event_atvenue (venueID, eventID, basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
-(3, 2, 50, '2014-03-24 04:13:21', 'Closed', '2014-03-24 04:14:21', '2014-03-24 20:13:21');
-INSERT INTO event_atvenue (venueID, eventID, basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
-(3, 3, 50, '2016-03-24 04:01:01', 'Closed', '2016-03-24 14:01:01', '2016-03-24 23:01:01');
-INSERT INTO event_atvenue (venueID, eventID, basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
-(4, 4, 50, '2025-04-01 06:34:13', 'Closed', '2025-04-01 16:34:13', '2025-04-01 23:34:13');
-INSERT INTO event_atvenue (venueID, eventID, basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
-(5, 5, 50, '2016-03-24 04:01:01', 'Closed', '2016-03-24 07:01:01', '2016-03-24 23:01:01');
+INSERT INTO event_atvenue (venueID, eventID, eventName, basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
+(1, 1, 'Alexisonfire', 30, '2014-04-14 00:00:01', 'Open', '2014-05-14 19:00:00', '2014-05-14 23:59:00');
+INSERT INTO event_atvenue (venueID, eventID,  eventName, basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
+(2, 2, 'Pink Floyd', 80, '2014-04-10 00:00:01', 'Closed', '2014-04-24 19:00:00', '2014-04-25 19:00:00');
+INSERT INTO event_atvenue (venueID, eventID,  eventName, basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
+(3, 3, 'CPSC 304: Back to the Database', 5, '2015-05-01 08:00:00', 'Closed', '2015-06-06 09:00:00', '2015-06-06 11:00:00');
+INSERT INTO event_atvenue (venueID, eventID,  eventName, basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
+(4, 4, 'Comic Con 39', 150, '2015-04-01 00:00:00', 'Closed', '2015-07-20 09:00:00', '2015-07-27 23:00:00');
+INSERT INTO event_atvenue (venueID, eventID, eventName,  basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
+(5, 5, '53rd Annual Gala', 25, '2015-02-01 00:00:01', 'Closed', '2015-04-13 18:30:00', '2015-04-15 21:00:00');
 
 
 INSERT INTO foradmissionto (eventID, ticketID) VALUES -
@@ -68,10 +77,36 @@ INSERT INTO foradmissionto (eventID, ticketID) VALUES -
 (1, 2);
 INSERT INTO foradmissionto (eventID, ticketID) VALUES -
 (1, 3);
+
+
 INSERT INTO foradmissionto (eventID, ticketID) VALUES -
-(1, 4);
+(2, 4);
 INSERT INTO foradmissionto (eventID, ticketID) VALUES -
-(1, 5);
+(2, 5);
+INSERT INTO foradmissionto (eventID, ticketID) VALUES -
+(2, 6);
+
+
+INSERT INTO foradmissionto (eventID, ticketID) VALUES -
+(3, 7);
+INSERT INTO foradmissionto (eventID, ticketID) VALUES -
+(3, 8);
+INSERT INTO foradmissionto (eventID, ticketID) VALUES -
+(3, 9);
+
+INSERT INTO foradmissionto (eventID, ticketID) VALUES -
+(4, 10);
+INSERT INTO foradmissionto (eventID, ticketID) VALUES -
+(4, 11);
+INSERT INTO foradmissionto (eventID, ticketID) VALUES -
+(4, 12);
+
+INSERT INTO foradmissionto (eventID, ticketID) VALUES -
+(5, 13);
+INSERT INTO foradmissionto (eventID, ticketID) VALUES -
+(5, 14);
+INSERT INTO foradmissionto (eventID, ticketID) VALUES -
+(5, 15);
 
 
 INSERT INTO organizer (organizerID, firstName, lastName, email, username, password) VALUES -
@@ -99,39 +134,107 @@ INSERT INTO organizes (organizerID, eventID) VALUES -
 
 
 INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
-(1, 1, 100, 50, 1);
+(1, 1, 10, 50, 1);
 INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
-(2, 1, 100, 50, 1);
+(1, 2, 20, 50, 2);
 INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
-(1, 2, 200, 50, 2);
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
-(2, 2, 200, 50, 2);
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
-(1, 3, 300, 50, 3);
+(1, 3, 30, 50, 3);
 
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+(2, 1, 10, 50, 1);
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+(2, 2, 20, 50, 2);
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+(2, 3, 30, 50, 3);
+
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+(3, 1, 10, 50, 1);
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+(3, 2, 20, 50, 2);
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+(3, 3, 30, 50, 3);
+
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+(4, 1, 10, 50, 1);
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+(4, 2, 20, 50, 2);
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+(4, 3, 30, 50, 3);
+
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+(5, 1, 10, 50, 1);
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+(5, 2, 20, 50, 2);
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+(5, 3, 30, 50, 3);
 
 INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
 (1, 1, 20, 5);
 INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
 (2, 1, 20, 5);
 INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
-(2, 1, 20, 6);
-INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
-(2, 1, 20, 7);
-INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
 (3, 1, 20, 5);
 
+INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
+(1, 2, 20, 5);
+INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
+(2, 2, 20, 5);
+INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
+(3, 2, 20, 5);
 
-INSERT INTO ticket_ownsseat (ticketID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES
-(1, 1, 1, 1, 20, 5);
-INSERT INTO ticket_ownsseat (ticketID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES -
-(2, 1, 2, 1, 20, 5);
-INSERT INTO ticket_ownsseat (ticketID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES -
-(3, 1, 2, 1, 20, 6);
-INSERT INTO ticket_ownsseat (ticketID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES -
-(4, 1, 2, 1, 20, 7);
-INSERT INTO ticket_ownsseat (ticketID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES -
-(5, 1, 3, 1, 20, 5);
+INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
+(1, 3, 20, 5);
+INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
+(2, 3, 20, 5);
+INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
+(3, 3, 20, 5);
+
+INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
+(1, 4, 20, 5);
+INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
+(2, 4, 20, 5);
+INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
+(3, 4, 20, 5);
+
+INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
+(1, 5, 20, 5);
+INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
+(2, 5, 20, 5);
+INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
+(3, 5, 20, 5);
+
+
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(1,1,0,1,1, 20, 5);
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(2,1,0,2,1, 20, 5);
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(3,1,0,3,1, 20, 5);
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(4,1,0,1,2, 20, 5);
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(5,2,0,2,2, 20, 5);
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(6,2,0,3,2, 20, 5);
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(7,2,0,1,3, 20, 5);
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(8,2,0,2,3, 20, 5);
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(9,3,0,3,3, 20, 5);
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(10,3,0,1,4, 20, 5);
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(11,3,0,2,4, 20, 5);
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(12,4,0,3,4, 20, 5);
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(13,4,0,1,5, 20, 5);
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(14,5,0,2,5, 20, 5);
+INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
+(15,5,0,3,5, 20, 5);
+
 
 COMMIT;
 END;
@@ -152,7 +255,7 @@ ADD CONSTRAINT event_atvenue_ibfk_1 FOREIGN KEY (venueID) REFERENCES venue (venu
 ALTER TABLE foradmissionto -
 ADD CONSTRAINT foradmissionto_ibfk_1 FOREIGN KEY (eventID) REFERENCES event_atvenue (eventID);
 ALTER TABLE foradmissionto -
-ADD CONSTRAINT foradmissionto_ibfk_2 FOREIGN KEY (ticketID) REFERENCES ticket_ownsseat (ticketID) ON DELETE CASCADE;
+ADD CONSTRAINT foradmissionto_ibfk_2 FOREIGN KEY (ticketID) REFERENCES Ticket_ownsSeat_WithCustomer (ticketID) ON DELETE CASCADE;
 
 --
 -- Constraints for table organizes
@@ -175,9 +278,9 @@ ALTER TABLE seat_insection -
 ADD CONSTRAINT seat_insection_ibfk_1 FOREIGN KEY (sectionID, venueID) REFERENCES seatingsection_invenue (sectionID, venueID) ON DELETE CASCADE;
 
 --
--- Constraints for table ticket_ownsseat
+-- Constraints for table Ticket_ownsSeat_WithCustomer
 --
-ALTER TABLE ticket_ownsseat -
+ALTER TABLE Ticket_ownsSeat_WithCustomer -
 ADD CONSTRAINT ticket_ownsseat_ibfk_1 FOREIGN KEY (sectionID, venueID) REFERENCES seatingsection_invenue (sectionID, venueID) ON DELETE CASCADE;
-ALTER TABLE ticket_ownsseat -
+ALTER TABLE Ticket_ownsSeat_WithCustomer -
 ADD CONSTRAINT ticket_ownsseat_ibfk_2 FOREIGN KEY (sectionID, venueID, seat_row, seatNo) REFERENCES seat_insection (sectionID, venueID, seat_row, seatNo) ON DELETE CASCADE;
