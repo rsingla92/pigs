@@ -13,7 +13,7 @@
 	<div id="form_container">
 	
 		<h1><a>Organizer</a></h1>
-		<form class="appnitro"  action="">
+		<form class="appnitro"  method="post" action="organizer.php">
 		<div class="form_description">
 			<h2>Organizer</h2>
 			<p>Organizer options.</p>
@@ -24,7 +24,7 @@
 			<h3>New Event</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 			At Venue (id): <br> <input type="text" name="venueID"><br>
 			Event Name: <br> <input type="text" name="name"><br>
 			Base Price: <br> <input type="text" name="basePrice"><br>
@@ -129,7 +129,7 @@
 			<h3>New Venue</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 			Venue Name: <br> <input type="text" name="name"><br>
 			Address: <br> <input type="text" name="address"><br>
 			City: <br> <input type="text" name="city"><br>
@@ -142,7 +142,7 @@
 			<h3>New Seating Section</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 			Additional Price: <br> <input type="text" name="additionalPrice"><br>
 			Seats Available: <br> <input type="text" name="seatsAvailable"><br>
 			<label class="description" for="element_9">Section Type:</label>
@@ -163,7 +163,7 @@
 			<h3>New Seat</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 			Row: <br> <input type="text" name="row"><br>
 			seatNo: <br> <input type="text" name="seatNo"><br>
 			For Section (ID): <br> <input type="text" name="sectionID"><br>
@@ -176,7 +176,7 @@
 			<h3>Delete Event</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 			Event (ID): <br> <input type="text" name="eventID"><br>
 		        <input type="hidden" name="action" value="5">	
 			<input type="submit" value="Delete">
@@ -186,7 +186,7 @@
 			<h3>Delete Venue</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 			Venue (ID): <br> <input type="text" name="venueID"><br>
 		        <input type="hidden" name="action" value="6">	
 			<input type="submit" value="Delete">
@@ -196,7 +196,7 @@
 			<h3>Delete Seat Section</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 			Section (ID): <br> <input type="text" name="sectionID"><br>
 		        <input type="hidden" name="action" value="7">	
 			<input type="submit" value="Delete">
@@ -206,7 +206,7 @@
 			<h3>Delete Seat</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 			Seat Row: <br> <input type="text" name="row"><br>
 			Seat Number: <br> <input type="text" name="seatNo"><br>
 		        <input type="hidden" name="action" value="8">	
@@ -217,7 +217,7 @@
 			<h3>Start Ticket Sales</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 			Event (ID): <br> <input type="text" name="eventID"><br>
 		        <input type="hidden" name="action" value="9">	
 			<input type="submit" value="Submit">
@@ -227,7 +227,7 @@
 			<h3>View All Events</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 		        <input type="hidden" name="action" value="10">	
 			<input type="submit" value="Submit">
 		</form>
@@ -236,7 +236,7 @@
 			<h3>View All Venues</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 		        <input type="hidden" name="action" value="11">	
 			<input type="submit" value="Submit">
 		</form>
@@ -245,7 +245,7 @@
 			<h3>View All Sections</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 		        <input type="hidden" name="action" value="12">	
 			<input type="submit" value="Submit">
 		</form>
@@ -254,7 +254,7 @@
 			<h3>View All Seats</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 		        <input type="hidden" name="action" value="13">	
 			<input type="submit" value="Submit">
 		</form>
@@ -263,7 +263,7 @@
 			<h3>View Purchased Seats</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 		        <input type="hidden" name="action" value="14">	
 			<input type="submit" value="Submit">
 		</form>
@@ -272,7 +272,7 @@
 			<h3>View Most Popular Venues</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 			Number Venues: <br> <input type="text" name="numVenues"><br>
 		        <input type="hidden" name="action" value="15">	
 			<input type="submit" value="Submit">
@@ -282,8 +282,8 @@
 			<h3>View Most Popular Events</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
-			Number Events: <br> <input type="text" name="numVenues"><br>
+		<form method="post" action="organizer.php">
+			Number Events: <br> <input type="text" name="numEvents"><br>
 		        <input type="hidden" name="action" value="16">	
 			<input type="submit" value="Submit">
 		</form>
@@ -292,7 +292,7 @@
 			<h3>Delete My Account</h3>
 			<p></p>
 		</li>
-		<form method="post" action="">
+		<form method="post" action="organizer.php">
 		        <input type="hidden" name="action" value="17">	
 			Submit to delete. Are you sure?? <input type="submit" value="Submit">
 		</form>
