@@ -6,15 +6,18 @@ function run_query($query)
   $c=oci_connect("ora_m8z7", "a43808104", "ug");
   if ($c == false) {
     echo "Unable to connect";
+    return false;
   }
+
   $parsed = oci_parse($c, $query);
   if ($parsed == false) {
     echo "Parse error: {$query}";
+    return false;
   }
-  $success = oci_execute($parsed);
 
+  $success = oci_execute($parsed);
   if ($success) {
-    return $parsed;
+    return get_html_table($parsed);
   }
   echo "Execute error on: ${query}\n";
   $e = oci_error($parsed);
@@ -25,7 +28,7 @@ function run_query($query)
   printf("\n%".($e['offset']+1)."s", "^");
   print  "\n</pre>\n";
 
-  return $success;
+  return false;
 }
 
 // Get html table string from query results

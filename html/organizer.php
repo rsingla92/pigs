@@ -99,7 +99,9 @@
             $section = $_POST['sectionID'];
             $venue = $_POST['venueID'];
             echo "Row {$row}, seat {$seat}, section {$section}, venue {$venue}.<br>";
-            echo "Could not create a seat at this time. No SQL support yet!<br>";
+            $fmt = "INSERT INTO Seat_inSection VALUES (%s, %s, %s, %s)";
+            $q = sprintf($fmt, $section, $venue, $row, $seat);
+            echo run_query($q);
         }
         else
         {
@@ -111,8 +113,10 @@
     {
         if (isset($_POST['eventID']))
         {
-            echo "Event ID: {$_POST['eventID']}.<br>";
-            echo "Could not delete the event at this time.<br>";
+          echo "Event ID: {$_POST['eventID']}.<br>";
+          $fmt = "DELETE FROM Event_atVenue WHERE eventID = %s";
+          $q = sprintf($fmt, $_POST['eventID']);
+          echo run_query($q);
         }
         else
         {
@@ -124,22 +128,25 @@
     {
         if (isset($_POST['venueID']))
         {
-            echo "Venue ID: {$_POST['venueID']}.<br>";
-            echo "Could not delete the venue at this time.<br>";
+          echo "Venue ID: {$_POST['venueID']}.<br>";
+          $fmt = "DELETE FROM Venue WHERE venueID = %s";
+          $q = sprintf($fmt, $_POST['venueID']);
+          echo run_query($q);
         }
         else
         {
             echo "Invalid parameters.<br>";
         }
-
     }
   
     function delete_seating_section()
     {
-        if (isset($_POST['sectionID']))
+      if (isset($_POST['venueID'], $_POST['sectionID']))
         {
-            echo "Section ID: {$_POST['sectionID']}.<br>";
-            echo "Could not delete the section at this time.<br>";
+          echo "Section ID: {$_POST['sectionID']}.<br>";
+          $fmt = "DELETE FROM SeatingSection_inVenue WHERE sectionID = %s AND venueID = %s";
+          $q = sprintf($fmt, $_POST['sectionID'], $_POST['venueID']);
+          echo run_query($q);
         }
         else
         {
@@ -152,8 +159,10 @@
     {
         if (isset($_POST['row']) && isset($_POST['seatNo']))
         {
-            echo "Row: {$_POST['row']}, Seat No: {$_POST['seatNo']}.<br>";
-            echo "Could not delete the seat at this time.<br>";
+          echo "Row: {$_POST['row']}, Seat No: {$_POST['seatNo']}.<br>";
+          $fmt = "DELETE FROM Seat_inSection WHERE sectionID = %s AND venueID = %s AND seat_row = %s AND seatNo = %s";
+          $q = sprintf($fmt, $_POST['sectionID'], $_POST['venueID'], $_POST['row'], $_POST['seatNo']);
+          echo run_query($q);
         }
         else
         {
@@ -166,8 +175,10 @@
     {
         if (isset($_POST['eventID']))
         {
-            echo "Event ID: {$_POST['eventID']}.<br>";
-            echo "Cannot start ticket sales at this time.<br>";
+          echo "Event ID: {$_POST['eventID']}.<br>";
+          $fmt = "UPDATE Event_atVenue SET saleOpenDate = CURRENT_TIMESTAMP WHERE eventID = %s";
+          $q = sprintf($fmt, $_POST['eventID']);
+          echo run_query($q);
         }
         else
         {
@@ -178,27 +189,27 @@
  
     function view_all_events()
     {
-        echo "Cannot view all events at this time. No SQL support!<br>";
+      echo run_query("SELECT * FROM Event_atVenue");
     }
   
     function view_all_venues()
     {
-        echo "Cannot view all venues at this time. No SQL support!<br>";
+      echo run_query("SELECT * FROM Venue");
     }
 
     function view_all_sections()
     {
-        echo "Cannot view all sections at this time. No SQL support!<br>";
+      echo run_query("SELECT * FROM SeatingSection_inVenue");
     }
   
     function view_all_seats()
     {
-        echo "Cannot view all seats at this time. No SQL support!<br>";
+      echo run_query("SELECT * FROM Seat_inSection");
     }
  
     function view_purchased_seats()
     {
-        echo "Cannot view all purchased seats at this time. No SQL support!<br>";
+      echo run_query("SELECT * FROM Ticket_ownsSeat_WithCustomer");
     }
 
     function view_most_popular_venues()
