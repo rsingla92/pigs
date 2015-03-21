@@ -55,7 +55,9 @@
        if (all_set($vals))
        {
            echo "Got venue with name {$_POST['name']}, address {$_POST['address']}, city {$_POST['city']}, province {$_POST['province']}.<br>";
-           echo "Could not create a new venue at this time. No SQL support yet!<br>";
+           $q = "INSERT INTO Venue VALUES (SEQ_VENUE.NEXTVAL, '%s', '%s', '%s', '%s')";
+           $qe = sprintf($q, $_POST['name'], $_POST['address'], $_POST['city'], $_POST['province']);
+           echo run_query($qe);
        }
        else
        {
