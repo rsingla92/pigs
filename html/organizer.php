@@ -32,15 +32,17 @@
 
     function create_event()
     {
-        $vals = array('venueID', 'name', 'basePrice', 'startTimeYear', 'startTimeMonth', 'startTimeDay',
-                      'startTimeHour', 'startTimeMinute', 'startTimeSel', 'endTimeYear', 'endTimeMonth',
-                      'endTimeDay', 'endTimeHour', 'endTimeMinute', 'endTimeSel', 'saleOpenTimeYear',
-                      'saleOpenTimeMonth', 'saleOpenTimeDay', 'saleOpenTimeHour', 'saleOpenTimeMinute',
-                      'saleOpenTimeSel');
+        $vals = array('venueID', 'name', 'basePrice',
+                      'startTime',
+                      'endTime',
+                      'saleOpenTime');
         if (all_set($vals))
         {
-           echo "Got venue with ID {$_POST['venueID']}, name {$_POST['name']}, and price {$_POST['basePrice']}.<br>";
-           echo "Could not create a new event at this time. No SQL support yet!<br>";
+          echo "Got venue with ID {$_POST['venueID']}, name {$_POST['name']}, and price {$_POST['basePrice']}.<br>";
+          $fmt = "INSERT INTO Event_atVenue VALUES (%s, SEQ_EVENT.NEXTVAL, '%s', %s, TO_TIMESTAMP('%s'), '%s', TO_TIMESTAMP('%s'), TO_TIMESTAMP('%s'))";
+          $q = sprintf($fmt, $_POST['venueID'], $_POST['name'], $_POST['basePrice'],
+            $_POST['saleOpenTime'], 'Closed', $_POST['startTime'], $_POST['endTime']);
+          echo run_query($q);
         }
         else
         {
