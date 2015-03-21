@@ -244,7 +244,9 @@
 
     function delete_account()
     {
-        echo "Cannot delete your account at this time. No SQL support!<br>";
+      // Don't know if this will work
+      $fmt = "DELETE FROM Organizer WHERE username = %s";
+      $q = sprintf($fmt, $_SESSION['login_user']);
     }
 
     $action_num = intval(get_post_default('action', '0'));
