@@ -17,6 +17,12 @@
         $hash_pass = sha1($pass); 
         // TODO: Check if in DB, else return false.
 
+        echo "Attempting to login user: {$user}.<br>";
+//            $query = 'INSERT INTO SeatingSection_inVenue (sectionID, venueID, additionalPrice, seatsAvailable, sectionSectionType) VALUES (SEQ_SECTION.NEXTVAL, '.$venue.',' . $price.','. $seats.','. $userType.')';
+           $queryCustomers = 'SELECT count(*) FROM Customer WHERE username = '.$user' AND password = '.$hash_passd' GROUP_BY userID';
+           $resultCustomers = run_query($queryCustomers);
+           echo $resultCustomers;
+
         session_start();
         $_SESSION['login_user'] = $user;
         return true;
