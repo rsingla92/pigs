@@ -13,6 +13,8 @@
 <div id="form_container">
 
 <?php
+    include 'db.php';
+
     function get_post_default($k, $default)
     {
         if (isset($_POST[$k])) return $_POST[$k];
@@ -25,11 +27,13 @@
         $eventName = get_post_default('eventName', '');
         $eventYear = get_post_default('eventYear', '');
         $eventMonth = get_post_default('eventMonth', '');
+	
+	$query = 'SELECT * FROM Event_atVenue E, venue V WHERE V.cityName = '."$eventCity" .' OR E.name = %'."$eventName" .'%\'';
+        
 
-        // TODO: Query based on input.
-        echo "Results for events named {$eventName} on the month of {$eventMonth}, {$eventYear} in the city of {$eventCity}:<br>";
-        echo "Nothing so far! Haven't added queries!<br>";
-        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+	echo "Results for events named {$eventName} on the month of {$eventMonth}, {$eventYear} in the city of {$eventCity}:<br>";
+	echo get_html_table(run_query($query));
+	echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 
     function find_open_sections()
@@ -37,17 +41,17 @@
         if (isset($_POST['eventID']))
         {
             $eventID = $_POST['eventID'];
-           
-            //TODO: Query based on input
+          
             echo "Open sections for event with ID {$eventID}:<br>";
-            echo "Nothing so far! Haven't added queries!<br>";
-        }
+	    $query = 'SELECT seatingSectionType FROM event_AtVenue E, ticket_ownsSeat_WithCustomers T, seatingSection_inVenue S WHERE E.eventID = '. $eventID .' E.venueID = S.venueID';
+	     echo get_html_table(run_query($query));
+	 }
         else
         {
             echo "Did not receive an eventID with request.<br>";
         }
 
-        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+        echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 
     function find_open_seats()
@@ -56,24 +60,26 @@
         {
             $eventID = $_POST['eventID'];
            
-            //TODO: Query based on input
             echo "Open seats for event with ID {$eventID}:<br>";
-            echo "Nothing so far! Haven't added queries!<br>";
+           
+	    $query = 'SELECT row, seatNo FROM ticket_OwnsSeat_WithCustomers T, Event_atVenue E WHERE T.venueID = E.venueID AND E.eventID = '. $eventID;
+	    echo get_html_table(run_query($query));
         }
         else
         {
             echo "Did not receive an eventID with request.<br>";
         }
 
-        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+        echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 
     function view_purchased_tickets()
     {
         // TODO: Query to find purchased tickets
         echo "Purchased tickets for customer with username {$_SESSION['login_user']}:<br>";
-        echo "None so far! Haven't added queries!<br>";
-        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+        $query = 'SELECT row, seatNo FROM ticket_ownsSeat_WithCustomers T, customer C WHERE T.userID = C.userID AND C.username = '. $_SESSION['login_user'] ;
+	echo get_html_table(run_query($query));
+        echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 
     function purchase_ticket()
@@ -87,14 +93,18 @@
             $seatNo = $_POST['seatNo'];
 
             // TODO: Write query to purchase tickets.
+	    $query = 'UPDATE ticket_ownsSeat_WithCustomers T SET T.isAvailable = 0 ';
+	    $query .= 'FROM ForAdmissionTo F WHERE F.eventID = ' .$eventID;
+            $query .= ' AND';
             echo "Purchased ticket for event with ID {$eventID}. You are in section {$seatSectionID} with row {$row} and seat {$seatNo}.<br>";
-        }
+	    echo get_html_table(run_query($query));
+    }
         else
         {
             echo "Did not receive the expected input for purchasing tickets.<br>";
         }
 
-        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+        echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 
     function most_popular_venues()
@@ -103,14 +113,16 @@
         {
             // TODO: Add query
             echo "List of {$_POST['numVenues']} most popular venue(s):<br>";
-            echo "Nothing so far! Must add query.<br>";
+      $result = run_query($query); 
+	    echo $result;
+            echo get_html_table(run_query($query));
         }
         else
         {
             echo "Did not receive the number of venues to return.<br>";
         }
 
-        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+        echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 
     function most_popular_events()
@@ -119,20 +131,23 @@
         {
             // TODO: Add query
             echo "List of {$_POST['numEvents']} most popular event(s):<br>";
-            echo "Nothing so far! Must add query.<br>";
+       $result = run_query($query); 
+	    echo get_html_table(run_query($query));
         }
         else
         {
             echo "Did not receive the number of events to return.<br>";
         }
 
-        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+        echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 
     function delete_account()
     {
         echo "Deleted user {$_SESSION['login_user']}.<br>";
-        unset($_SESSION['login_user']);
+        $result = run_query($query); 
+        echo get_html_table(run_query($query));
+ unset($_SESSION['login_user']);
         session_destroy();
     }
 
@@ -168,14 +183,14 @@
                 break;
             default:
                 echo "Invalid operation.<br>";
-                echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+                echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
                 break;
         }
     }
     else
     {
          echo "Invalid operation.<br>";
-         echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+         echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 ?>
 
