@@ -18,10 +18,13 @@
         // TODO: Check if in DB, else return false.
 
         echo "Attempting to login user: {$user}.<br>";
-//            $query = 'INSERT INTO SeatingSection_inVenue (sectionID, venueID, additionalPrice, seatsAvailable, sectionSectionType) VALUES (SEQ_SECTION.NEXTVAL, '.$venue.',' . $price.','. $seats.','. $userType.')';
-           $queryCustomers = 'SELECT count(*) FROM Customer WHERE username = '.$user' AND password = '.$hash_passd' GROUP_BY userID';
-           $resultCustomers = run_query($queryCustomers);
-           echo $resultCustomers;
+
+//        $q = "SELECT count(*) FROM Customer WHERE username = '%s' AND password = '%s' GROUP_BY userID";
+//        $qe = sprintf($q, $user, $hash_passd);
+
+        $qe = "SELECT userID FROM customer";
+        echo $qe;
+        echo run_query($qe);
 
         session_start();
         $_SESSION['login_user'] = $user;
@@ -31,7 +34,7 @@
     if (handle_login())
     {
         // TODO: Base page on user type
-        header('Location: Customer.html');
+        //header('Location: customer.html');
     }
     else
     {
@@ -43,6 +46,6 @@
         echo '<script type="text/javascript" src="view.js"></script>';
         echo '</head><body id="main_body" ><img id="top" src="top.png" alt=""><div id="form_container">';
         echo 'Invalid username and/or password.<br>.';
-        echo "Click <a href=\"loginForm.html\">here<//a> to try again.";
+        echo "Click <a href=\"login.html\">here<//a> to try again.";
     }
 ?>
