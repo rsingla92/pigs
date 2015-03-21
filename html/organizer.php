@@ -216,8 +216,10 @@
     {
         if (isset($_POST['numVenues']))
         {
-            echo "Num venues: {$_POST['numVenues']}.<br>";
-            echo "Cannot view most popular venues at this time. No SQL support!<br>";
+          echo "Num venues: {$_POST['numVenues']}.<br>";
+          $fmt = "SELECT V.venueID, count(*) as events FROM Venue V, Event_atVenue E WHERE V.venueID = E.venueID AND ROWNUM <= %s GROUP BY V.venueID ORDER BY count(*)";
+          $q = sprintf($fmt, $_POST['numVenues']);
+          echo run_query($q);
         }
         else
         {
