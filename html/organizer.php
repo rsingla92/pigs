@@ -13,6 +13,8 @@
 <div id="form_container">
 
 <?php
+    include 'db.php';
+
     function get_post_default($k, $default)
     {
         if (isset($_POST[$k])) return $_POST[$k];
@@ -53,7 +55,7 @@
        if (all_set($vals))
        {
            echo "Got venue with name {$_POST['name']}, address {$_POST['address']}, city {$_POST['city']}, province {$_POST['province']}.<br>";
-           echo "Coult not create a new venue at this time. No SQL support yet!<br>";
+           echo "Could not create a new venue at this time. No SQL support yet!<br>";
        }
        else
        {
@@ -72,7 +74,9 @@
             $userType = $_POST['userType'];
             $venue = $_POST['venueID'];
             echo "Got new seating section w/ price {$price}, seats {$seats}. user type {$userType} and venue {$venue}.<br>";
-            echo "Could not create a seating section at this time. No SQL support yet!<br>";
+            $query = "INSERT INTO SeatingSection_inVenue (venueID, additionalPrice, seatsAvailable, sectionSectionType) VALUES {$venue}, {$price}, {$seats}, ${userType}";
+            $result = run_query($query);
+            echo $result;
         }
         else
         {
