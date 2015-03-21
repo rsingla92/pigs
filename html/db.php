@@ -1,18 +1,30 @@
 <?php
 
-$login = "ora_m8z7@ug";
-$password = "a43808104";
 // Run a query
 function run_query($query)
 {
-  $c=oci_connect($login, $pass, "ug");
+  $c=oci_connect("ora_m8z7", "a43808104", "ug");
+  if ($c == false) {
+    echo "Unable to connect";
+  }
   $parsed = oci_parse($c, $query);
+  if ($parsed == false) {
+    echo "Parse error: {$query}";
+  }
   $success = oci_execute($parsed);
 
   if ($success) {
     return $parsed;
   }
-  echo "fail";
+  echo "Execute error on: ${query}\n";
+  $e = oci_error($parsed);
+  echo "Error:";
+  print htmlentities($e['message']);
+  print "\n<pre>\n";
+  print htmlentities($e['sqltext']);
+  printf("\n%".($e['offset']+1)."s", "^");
+  print  "\n</pre>\n";
+
   return $success;
 }
 

@@ -13,24 +13,32 @@ drop table ForAdmissionTo CASCADE CONSTRAINTS;
 
 -- Create tables with their constraints
 CREATE TABLE Venue (venueID INT , name VARCHAR(255), address VARCHAR(255), cityName VARCHAR(255), provName VARCHAR(255), PRIMARY KEY (venueID), UNIQUE (address, cityName, provName));
+CREATE SEQUENCE SEQ_VENUE START WITH 10 INCREMENT BY 1;
 
 CREATE TABLE Event_atVenue (venueID INT, eventID INT, eventName VARCHAR(255), basePrice INT, saleOpenDate TIMESTAMP, ticketStatus VARCHAR(255), startTime TIMESTAMP, endTime TIMESTAMP, PRIMARY KEY(eventID), UNIQUE (startTime, endTime, venueID));
 --ALTER TABLE Event_atVenue ADD CONSTRAINT fkv FOREIGN KEY (venueID) REFERENCES Venue (venueID) ON DELETE SET NULL;
+CREATE SEQUENCE SEQ_EVENT START WITH 10 INCREMENT BY 1;
 
 CREATE TABLE SeatingSection_inVenue (venueID INT, sectionID INT NOT NULL , additionalPrice INT, seatsAvailable INT NOT NULL, sectionSectionType INT NOT NULL, PRIMARY KEY (sectionID, venueID));
+CREATE SEQUENCE SEQ_SECTION START WITH 10 INCREMENT BY 1;
 
 CREATE TABLE Seat_inSection (sectionID INT, venueID INT, seat_row INT, seatNo INT, PRIMARY KEY (sectionID, venueID, seat_row, seatNo));
+CREATE SEQUENCE SEQ_SEAT START WITH 10 INCREMENT BY 1;
 
 CREATE TABLE Customer (userID INT, firstName VARCHAR(255), lastName VARCHAR(255), email VARCHAR(255), username VARCHAR(255), password VARCHAR(255), PRIMARY KEY(userID), UNIQUE(email), UNIQUE(username));
+CREATE SEQUENCE SEQ_CUSTOMER START WITH 10 INCREMENT BY 1;
 
 CREATE TABLE Ticket_ownsSeat_WithCustomer(ticketID INT, userID INT, isAvailable CHAR, sectionID INT, venueID INT, seat_row INT, seatNo INT, PRIMARY KEY (ticketID));
 --ALTER TABLE Ticket_ownsSeat_WithCustomer ADD CONSTRAINT ticket_ownsseat_ibfk_3 FOREIGN KEY (userID) REFERENCES Customer(userID) ON DELETE SET NULL;
+CREATE SEQUENCE SEQ_TICKET START WITH 10 INCREMENT BY 1;
 
 CREATE TABLE Organizer (organizerID INT, firstName VARCHAR(255) NOT NULL, lastName VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, username VARCHAR(255), password VARCHAR(255), PRIMARY KEY(organizerID), UNIQUE(username), UNIQUE(email));
+CREATE SEQUENCE SEQ_ORGANIZER START WITH 10 INCREMENT BY 1;
 
 CREATE TABLE Organizes (organizerID INT, eventID INT, PRIMARY KEY(organizerID, eventID));
 
 CREATE TABLE ForAdmissionTo(eventID INT, ticketID INT, PRIMARY KEY(eventID, ticketID));
+
 
 -- Add mock data
 COMMIT;
