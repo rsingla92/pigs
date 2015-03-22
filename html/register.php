@@ -59,8 +59,8 @@
 
             $qe = sprintf($q, $first_name, $last_name, $email, $user, $pswd);
             $result = run_query($qe);
-            echo get_html_table("SELECT * FROM Customer");
-            echo get_html_table("SELECT * FROM Organizer");
+            //echo get_html_table("SELECT * FROM Customer");
+            //echo get_html_table("SELECT * FROM Organizer");
         }
     }
 ?>
