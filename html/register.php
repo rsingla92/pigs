@@ -31,19 +31,36 @@
     }
     else
     {
-        $pswd = sha1($_POST["password"]);
-        $pswd_confirm = sha1($_POST["password_confirm"]);
+        $pswd = $_POST["password"];
+        $pswd_confirm = $_POST["password_confirm"];
 
         if (strcmp($pswd, $pswd_confirm) !== 0) 
         {
             echo "Your password and confirmed password did not match.<br>";
-            echo "Click <a href=\"CreateAccount.html\">here<//a> to try again.";
+            echo "Click <a href=\"register.html\">here<//a> to try again.";
         }
         else
         {
             echo "Hello, {$first_name} {$last_name}. You have successfully created an account.<br>";
-            echo "Click <a href=\"loginForm.html\">here<//a> to login.";
-            // TODO: Store data in DB here
+            echo "Click <a href=\"login.html\">here<//a> to login.";
+            
+            if ($user_type == 1)
+            {
+                // customer
+                $q = "INSERT INTO customer(userID, firstName, lastName, email, username, password) VALUES - (999, '%s', '%s', '%s', '%s', '%s')"; // TODO - change away from 999
+            }
+            else if ($user_type == 2)
+            {
+                // organizer
+                $q = "INSERT INTO organizer (organizerID, firstName, lastName, email, username, password) VALUES - (999, '%s', '%s', '%s', '%s', '%s')"; // TODO - change away from 999
+            }
+
+            $qe = sprintf($q, $first_name, $last_name, $email, $user, $pswd);
+            $result = run_query($qe);
+            if ($result)
+            {
+                
+            }
         }
     }
 ?>

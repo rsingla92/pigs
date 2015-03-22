@@ -1,4 +1,6 @@
 <?php
+    include 'db.php';
+    
     function handle_login()
     {
        $user = trim($_POST['user']);
@@ -14,27 +16,46 @@
             return false;
         }
 
-        $hash_pass = sha1($pass); 
-        // TODO: Check if in DB, else return false.
-
         echo "Attempting to login user: {$user}.<br>";
 
-//        $q = "SELECT count(*) FROM Customer WHERE username = '%s' AND password = '%s' GROUP_BY userID";
-//        $qe = sprintf($q, $user, $hash_passd);
+        $q = "SELECT * FROM Customer WHERE username = '%s' AND password = '%s'";
+        $qe = sprintf($q, $user, $pass);
 
-        $qe = "SELECT userID FROM customer";
-        echo $qe;
-        echo run_query($qe);
+        $num_rows = num_rows_in_select($qe);
 
-        session_start();
-        $_SESSION['login_user'] = $user;
-        return true;
+        if ($num_rows == 1)
+        {
+            session_start();
+            $_SESSION['login_user'] = $user;
+            $_SESSION['login_user_id'] = $userID; // TODO
+            return 'customer';
+        }
+    
+        $q = "SELECT * FROM Organizer WHERE username = '%s' AND password = '%s'";
+        $qe = sprintf($q, $user, $pass);
+
+        //echo get_html_table(run_query("SELECT * FROM Organizer")); // for debug only
+
+        $num_rows = num_rows_in_select($qe);
+
+        if ($num_rows == 1)
+        {
+            session_start();
+            $_SESSION['login_user'] = $user;
+            $_SESSION['login_user_id'] = $userID; // TODO
+            return 'organizer';
+        }
+        
+        return false;
     }
 
-    if (handle_login())
+    if (handle_login() == 'customer')
     {
-        // TODO: Base page on user type
-        //header('Location: customer.html');
+        header('Location: customer.html');
+    }
+    else if (handle_login() == 'organizer')
+    {
+        header('Location: organizer.html');
     }
     else
     {
