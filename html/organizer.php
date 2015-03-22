@@ -13,7 +13,12 @@
 <div id="form_container">
 
 <?php
-    include 'db.php';
+include 'db.php';
+$username = $_SESSION['login_user'];
+$a = "SELECT organizerID from Organizer WHERE username = '%s'";
+$q = sprintf($a, $username);
+$result = run_query($q);
+$organizerID = oci_result($result, 0);
 
     function get_post_default($k, $default)
     {
@@ -32,15 +37,23 @@
 
     function create_event()
     {
-        $vals = array('venueID', 'name', 'basePrice', 'startTimeYear', 'startTimeMonth', 'startTimeDay',
-                      'startTimeHour', 'startTimeMinute', 'startTimeSel', 'endTimeYear', 'endTimeMonth',
-                      'endTimeDay', 'endTimeHour', 'endTimeMinute', 'endTimeSel', 'saleOpenTimeYear',
-                      'saleOpenTimeMonth', 'saleOpenTimeDay', 'saleOpenTimeHour', 'saleOpenTimeMinute',
-                      'saleOpenTimeSel');
+        $vals = array('venueID', 'name', 'basePrice',
+                      'startTime',
+                      'endTime',
+                      'saleOpenTime');
         if (all_set($vals))
         {
-           echo "Got venue with ID {$_POST['venueID']}, name {$_POST['name']}, and price {$_POST['basePrice']}.<br>";
-           echo "Could not create a new event at this time. No SQL support yet!<br>";
+          echo "Got venue with ID {$_POST['venueID']}, name {$_POST['name']}, and price {$_POST['basePrice']}.<br>";
+          $fmt = "INSERT INTO Event_atVenue VALUES (%s, SEQ_EVENT.NEXTVAL, '%s', %s, TO_TIMESTAMP('%s'), '%s', TO_TIMESTAMP('%s'), TO_TIMESTAMP('%s'))";
+          $q = sprintf($fmt, $_POST['venueID'], $_POST['name'], $_POST['basePrice'],
+            $_POST['saleOpenTime'], 'Closed', $_POST['startTime'], $_POST['endTime']);
+          $r1 = get_html_table($q);
+
+          // Need to get created event id
+
+          $f2 = "INSERT INTO Ogranizes VALUES (%s, %s)";
+          //$q2 = sprintf($f2, $organizerID, $)
+
         }
         else
         {
@@ -57,7 +70,7 @@
            echo "Got venue with name {$_POST['name']}, address {$_POST['address']}, city {$_POST['city']}, province {$_POST['province']}.<br>";
            $q = "INSERT INTO Venue VALUES (SEQ_VENUE.NEXTVAL, '%s', '%s', '%s', '%s')";
            $qe = sprintf($q, $_POST['name'], $_POST['address'], $_POST['city'], $_POST['province']);
-           echo run_query($qe);
+           echo get_html_table($qe);
        }
        else
        {
@@ -77,7 +90,7 @@
             $venue = $_POST['venueID'];
             echo "Got new seating section w/ price {$price}, seats {$seats}. user type {$userType} and venue {$venue}.<br>";
             $query = 'INSERT INTO SeatingSection_inVenue (sectionID, venueID, additionalPrice, seatsAvailable, sectionSectionType) VALUES (SEQ_SECTION.NEXTVAL, '.$venue.',' . $price.','. $seats.','. $userType.')';
-            $result = run_query($query);
+            $result = get_html_table($query);
             echo $result;
         }
         else
@@ -97,7 +110,9 @@
             $section = $_POST['sectionID'];
             $venue = $_POST['venueID'];
             echo "Row {$row}, seat {$seat}, section {$section}, venue {$venue}.<br>";
-            echo "Could not create a seat at this time. No SQL support yet!<br>";
+            $fmt = "INSERT INTO Seat_inSection VALUES (%s, %s, %s, %s)";
+            $q = sprintf($fmt, $section, $venue, $row, $seat);
+            echo get_html_table($q);
         }
         else
         {
@@ -109,8 +124,10 @@
     {
         if (isset($_POST['eventID']))
         {
-            echo "Event ID: {$_POST['eventID']}.<br>";
-            echo "Could not delete the event at this time.<br>";
+          echo "Event ID: {$_POST['eventID']}.<br>";
+          $fmt = "DELETE FROM Event_atVenue WHERE eventID = %s";
+          $q = sprintf($fmt, $_POST['eventID']);
+          echo get_html_table($q);
         }
         else
         {
@@ -122,22 +139,25 @@
     {
         if (isset($_POST['venueID']))
         {
-            echo "Venue ID: {$_POST['venueID']}.<br>";
-            echo "Could not delete the venue at this time.<br>";
+          echo "Venue ID: {$_POST['venueID']}.<br>";
+          $fmt = "DELETE FROM Venue WHERE venueID = %s";
+          $q = sprintf($fmt, $_POST['venueID']);
+          echo get_html_table($q);
         }
         else
         {
             echo "Invalid parameters.<br>";
         }
-
     }
   
     function delete_seating_section()
     {
-        if (isset($_POST['sectionID']))
+      if (isset($_POST['venueID'], $_POST['sectionID']))
         {
-            echo "Section ID: {$_POST['sectionID']}.<br>";
-            echo "Could not delete the section at this time.<br>";
+          echo "Section ID: {$_POST['sectionID']}.<br>";
+          $fmt = "DELETE FROM SeatingSection_inVenue WHERE sectionID = %s AND venueID = %s";
+          $q = sprintf($fmt, $_POST['sectionID'], $_POST['venueID']);
+          echo get_html_table($q);
         }
         else
         {
@@ -150,8 +170,10 @@
     {
         if (isset($_POST['row']) && isset($_POST['seatNo']))
         {
-            echo "Row: {$_POST['row']}, Seat No: {$_POST['seatNo']}.<br>";
-            echo "Could not delete the seat at this time.<br>";
+          echo "Row: {$_POST['row']}, Seat No: {$_POST['seatNo']}.<br>";
+          $fmt = "DELETE FROM Seat_inSection WHERE sectionID = %s AND venueID = %s AND seat_row = %s AND seatNo = %s";
+          $q = sprintf($fmt, $_POST['sectionID'], $_POST['venueID'], $_POST['row'], $_POST['seatNo']);
+          echo get_html_table($q);
         }
         else
         {
@@ -164,8 +186,10 @@
     {
         if (isset($_POST['eventID']))
         {
-            echo "Event ID: {$_POST['eventID']}.<br>";
-            echo "Cannot start ticket sales at this time.<br>";
+          echo "Event ID: {$_POST['eventID']}.<br>";
+          $fmt = "UPDATE Event_atVenue SET saleOpenDate = CURRENT_TIMESTAMP WHERE eventID = %s";
+          $q = sprintf($fmt, $_POST['eventID']);
+          echo get_html_table($q);
         }
         else
         {
@@ -176,35 +200,37 @@
  
     function view_all_events()
     {
-        echo "Cannot view all events at this time. No SQL support!<br>";
+      echo get_html_table("SELECT * FROM Event_atVenue");
     }
   
     function view_all_venues()
     {
-        echo "Cannot view all venues at this time. No SQL support!<br>";
+      echo get_html_table("SELECT * FROM Venue");
     }
 
     function view_all_sections()
     {
-        echo "Cannot view all sections at this time. No SQL support!<br>";
+      echo get_html_table("SELECT * FROM SeatingSection_inVenue");
     }
   
     function view_all_seats()
     {
-        echo "Cannot view all seats at this time. No SQL support!<br>";
+      echo get_html_table("SELECT * FROM Seat_inSection");
     }
  
     function view_purchased_seats()
     {
-        echo "Cannot view all purchased seats at this time. No SQL support!<br>";
+      echo get_html_table("SELECT * FROM Ticket_ownsSeat_WithCustomer");
     }
 
     function view_most_popular_venues()
     {
         if (isset($_POST['numVenues']))
         {
-            echo "Num venues: {$_POST['numVenues']}.<br>";
-            echo "Cannot view most popular venues at this time. No SQL support!<br>";
+          echo "Num venues: {$_POST['numVenues']}.<br>";
+          $fmt = "SELECT V.venueID, count(*) as events FROM Venue V, Event_atVenue E WHERE V.venueID = E.venueID AND ROWNUM <= %s GROUP BY V.venueID ORDER BY count(*)";
+          $q = sprintf($fmt, $_POST['numVenues']);
+          echo get_html_table($q);
         }
         else
         {
@@ -216,8 +242,10 @@
     {
         if (isset($_POST['numEvents']))
         {
-            echo "Num Events: {$_POST['numEvents']}.<br>";
-            echo "Cannot view the most popular events at this time. No SQL support!<br>";
+          echo "Num Events: {$_POST['numEvents']}.<br>";
+          $fmt = "SELECT E.eventID, count(*) FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T WHERE E.eventID = FAT.eventID AND FAT.ticketID = T.ticketID AND ROWNUM <= %s GROUP BY E.eventID ORDER BY count(*)";
+          $q = sprintf($fmt, $_POST['numEvents']);
+          echo get_html_table($q);
         }
         else
         {
@@ -227,7 +255,9 @@
 
     function delete_account()
     {
-        echo "Cannot delete your account at this time. No SQL support!<br>";
+      // Don't know if this will work
+      $fmt = "DELETE FROM Organizer WHERE username = %s";
+      $q = sprintf($fmt, $_SESSION['login_user']);
     }
 
     $action_num = intval(get_post_default('action', '0'));
