@@ -23,12 +23,12 @@
 
     function find_event()
     {
-        $eventCity = get_post_default('eventCity', ''); 
-        $eventName = get_post_default('eventName', '');
-        $eventYear = get_post_default('eventYear', '');
+        $eventCity = get_post_default('eventCity', ' '); 
+        $eventName = get_post_default('eventName', ' ');
+        $eventYear = get_post_default('eventYear', ' ');
         $eventMonth = get_post_default('eventMonth', '');
 	
-	$query = 'SELECT * FROM Event_atVenue E, venue V WHERE V.cityName = '."$eventCity" .' OR E.name = %'."$eventName" .'%\'';
+	$query = 'SELECT * FROM Event_atVenue E, venue V WHERE E.venueID = V.venueID AND V.cityName LIKE \''."$eventCity" .'\' OR E.eventName LIKE \''.$eventName .'%\'';
         
 
 	echo "Results for events named {$eventName} on the month of {$eventMonth}, {$eventYear} in the city of {$eventCity}:<br>";
@@ -43,7 +43,7 @@
             $eventID = $_POST['eventID'];
           
             echo "Open sections for event with ID {$eventID}:<br>";
-	    $query = 'SELECT seatingSectionType FROM event_AtVenue E, ticket_ownsSeat_WithCustomers T, seatingSection_inVenue S WHERE E.eventID = '. $eventID .' E.venueID = S.venueID';
+	    $query = 'SELECT distinct sectionSectionType, E.venueID FROM event_AtVenue E, ticket_ownsSeat_WithCustomer T, seatingSection_inVenue S WHERE E.eventID = '. $eventID .' AND E.venueID = S.venueID AND S.seatsAvailable > 0';
 	     echo run_query($query);
 	 }
         else
@@ -62,7 +62,7 @@
            
             echo "Open seats for event with ID {$eventID}:<br>";
            
-	    $query = 'SELECT row, seatNo FROM ticket_OwnsSeat_WithCustomers T, Event_atVenue E WHERE T.venueID = E.venueID AND E.eventID = '. $eventID;
+	    $query = 'SELECT distinct T.seat_row, T.seatNo FROM ticket_OwnsSeat_WithCustomer T, Event_atVenue E WHERE T.venueID = E.venueID AND E.eventID = '. $eventID;
 	    echo run_query($query);
         }
         else
@@ -77,7 +77,8 @@
     {
         // TODO: Query to find purchased tickets
         echo "Purchased tickets for customer with username {$_SESSION['login_user']}:<br>";
-        $query = 'SELECT row, seatNo FROM ticket_ownsSeat_WithCustomers T, customer C WHERE T.userID = C.userID AND C.username = '. $_SESSION['login_user'] ;
+        $username = $_SESSION['login_user'];
+	$query = 'SELECT seat_row, seatNo FROM ticket_ownsSeat_WithCustomers T, customer C WHERE T.userID = C.userID AND C.username = '. $username ;
 	echo run_query($query);
         echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
@@ -93,7 +94,7 @@
             $seatNo = $_POST['seatNo'];
 
             // TODO: Write query to purchase tickets.
-	    $query = 'UPDATE ticket_ownsSeat_WithCustomers T SET T.isAvailable = 0 ';
+	    $query = 'UPDATE ticket_ownsSeat_WithCustomer T SET T.isAvailable = 0 ';
 	    $query .= 'FROM ForAdmissionTo F WHERE F.eventID = ' .$eventID;
             $query .= 'T.ticketID AND F.ticketID AND T.seat_row = '. $row .' AND T.seatNo = '. $seatNo .' T.sectionID = '. $seatSectionID;
             echo "Purchased ticket for event with ID {$eventID}. You are in section {$seatSectionID} with row {$row} and seat {$seatNo}.<br>";
@@ -112,9 +113,9 @@
         if (isset($_POST['numVenues']))
         {
             echo "List of {$_POST['numVenues']} most popular venue(s):<br>";
-	    $query = 'SELECT V.name, VC.cnt FROM venues V, (SELECT V.venueID, COUNT(*) cnt FORM ticket_OwnsSeat_WithCustomer T GROUP BY V.venueID) VC WHERE ROWNUM <= '. $numVenues .'ORDER BY VC.cnt';   
+	    $numVenues = $_POST['numVenues'];
+	    $query = 'SELECT V.name, VC.cnt FROM venue V, (SELECT V.venueID, COUNT(*) cnt FROM ticket_OwnsSeat_WithCustomer T, venue V GROUP BY V.venueID) VC WHERE ROWNUM <= '. $numVenues .' ORDER BY VC.cnt';   
 	
- $query = 'SELECT E.eventName, COUNT(*) FROM Event_atVenue EV, forAdmissionTo F, ticket_OwnsSeat_WithCustomer T WHERE F.eventID = E.eventID AND T.ticketAvailable = 0 AND ROWNUM <= '. $numVenues .' GROUP BY E.eventName';
             echo run_query($query);
         }
         else
@@ -130,7 +131,8 @@
         if (isset($_POST['numEvents']))
         {
             echo "List of {$_POST['numEvents']} most popular event(s):<br>";
- 	    $query = 'SELECT E.eventName, COUNT(*) FROM Event_atVenue EV, forAdmissionTo F, ticket_OwnsSeat_WithCustomer T WHERE F.eventID = E.eventID AND T.ticketAvailable = 0 AND ROWNUM <= '. $numVenues .' GROUP BY E.eventName';
+	    $numEvents = $_POST['numEvents'];
+ 	    $query = 'SELECT EV.eventName, COUNT(*) FROM Event_atVenue EV, forAdmissionTo F, ticket_OwnsSeat_WithCustomer T WHERE F.eventID = EV.eventID AND T.isAvailable = 0 AND ROWNUM <= '. $numEvents .' GROUP BY EV.eventName';
 	    echo run_query($query);
         }
         else
@@ -144,9 +146,11 @@
     function delete_account()
     {
         echo "Deleted user {$_SESSION['login_user']}.<br>";
+	$username = $_SESSION['login_user'];
+        $query = 'DELETE FROM Organizer WHERE username = ' . $username;
         $result = run_query($query); 
-        echo get_html_table(run_query($query));
- unset($_SESSION['login_user']);
+ 	
+	unset($_SESSION['login_user']);
         session_destroy();
     }
 
