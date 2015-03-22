@@ -3,7 +3,7 @@
 // Run a query
 function run_query($query)
 {
-  $c=oci_connect("ora_m8z7", "a43808104", "ug");
+  $c=oci_connect("ora_c2y7", "a49084106", "ug");
   if ($c == false) {
     echo "Unable to connect";
     return false;
@@ -64,7 +64,7 @@ function get_html_table($query)
 
 function num_rows_in_select($selQuery)
 {
-  $c=oci_connect("ora_m8z7", "a43808104", "ug");
+  $c=oci_connect("ora_c2y7", "a49084106", "ug");
   if ($c == false) {
     echo "Unable to connect";
   }
