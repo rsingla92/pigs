@@ -15,6 +15,14 @@ drop table Organizer CASCADE CONSTRAINTS;
 drop table Organizes CASCADE CONSTRAINTS;
 drop table ForAdmissionTo CASCADE CONSTRAINTS;
 
+drop SEQUENCE SEQ_VENUE;
+drop SEQUENCE SEQ_EVENT;
+drop SEQUENCE SEQ_SECTION;
+drop SEQUENCE SEQ_SEAT;
+drop SEQUENCE SEQ_CUSTOMER;
+drop SEQUENCE SEQ_TICKET;
+drop SEQUENCE SEQ_ORGANIZER;
+
 -- Create tables with their constraints
 CREATE TABLE Venue (venueID INT , name VARCHAR(255), address VARCHAR(255), cityName VARCHAR(255), provName VARCHAR(255), oranizerID INT, PRIMARY KEY (venueID), UNIQUE (address, cityName, provName));
 CREATE SEQUENCE SEQ_VENUE START WITH 10 INCREMENT BY 1;
