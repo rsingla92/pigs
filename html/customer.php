@@ -13,6 +13,8 @@
 <div id="form_container">
 
 <?php
+    include 'db.php';
+
     function get_post_default($k, $default)
     {
         if (isset($_POST[$k])) return $_POST[$k];
@@ -21,15 +23,17 @@
 
     function find_event()
     {
-        $eventCity = get_post_default('eventCity', ''); 
-        $eventName = get_post_default('eventName', '');
-        $eventYear = get_post_default('eventYear', '');
+        $eventCity = get_post_default('eventCity', ' '); 
+        $eventName = get_post_default('eventName', ' ');
+        $eventYear = get_post_default('eventYear', ' ');
         $eventMonth = get_post_default('eventMonth', '');
+	
+	$query = 'SELECT * FROM Event_atVenue E, venue V WHERE E.venueID = V.venueID AND V.cityName LIKE \''."$eventCity" .'\' OR E.eventName LIKE \''.$eventName .'%\'';
+        
 
-        // TODO: Query based on input.
-        echo "Results for events named {$eventName} on the month of {$eventMonth}, {$eventYear} in the city of {$eventCity}:<br>";
-        echo "Nothing so far! Haven't added queries!<br>";
-        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+	echo "Results for events named {$eventName} on the month of {$eventMonth}, {$eventYear} in the city of {$eventCity}:<br>";
+	echo run_query($query);
+	echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 
     function find_open_sections()
@@ -37,17 +41,17 @@
         if (isset($_POST['eventID']))
         {
             $eventID = $_POST['eventID'];
-           
-            //TODO: Query based on input
+          
             echo "Open sections for event with ID {$eventID}:<br>";
-            echo "Nothing so far! Haven't added queries!<br>";
-        }
+	    $query = 'SELECT distinct sectionSectionType, E.venueID FROM event_AtVenue E, ticket_ownsSeat_WithCustomer T, seatingSection_inVenue S WHERE E.eventID = '. $eventID .' AND E.venueID = S.venueID AND S.seatsAvailable > 0';
+	     echo run_query($query);
+	 }
         else
         {
             echo "Did not receive an eventID with request.<br>";
         }
 
-        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+        echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 
     function find_open_seats()
@@ -56,24 +60,27 @@
         {
             $eventID = $_POST['eventID'];
            
-            //TODO: Query based on input
             echo "Open seats for event with ID {$eventID}:<br>";
-            echo "Nothing so far! Haven't added queries!<br>";
+           
+	    $query = 'SELECT distinct T.seat_row, T.seatNo FROM ticket_OwnsSeat_WithCustomer T, Event_atVenue E WHERE T.venueID = E.venueID AND E.eventID = '. $eventID;
+	    echo run_query($query);
         }
         else
         {
             echo "Did not receive an eventID with request.<br>";
         }
 
-        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+        echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 
     function view_purchased_tickets()
     {
         // TODO: Query to find purchased tickets
         echo "Purchased tickets for customer with username {$_SESSION['login_user']}:<br>";
-        echo "None so far! Haven't added queries!<br>";
-        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+        $username = $_SESSION['login_user'];
+	$query = 'SELECT seat_row, seatNo FROM ticket_ownsSeat_WithCustomers T, customer C WHERE T.userID = C.userID AND C.username = '. $username ;
+	echo run_query($query);
+        echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 
     function purchase_ticket()
@@ -87,52 +94,63 @@
             $seatNo = $_POST['seatNo'];
 
             // TODO: Write query to purchase tickets.
+	    $query = 'UPDATE ticket_ownsSeat_WithCustomer T SET T.isAvailable = 0 ';
+	    $query .= 'FROM ForAdmissionTo F WHERE F.eventID = ' .$eventID;
+            $query .= 'T.ticketID AND F.ticketID AND T.seat_row = '. $row .' AND T.seatNo = '. $seatNo .' T.sectionID = '. $seatSectionID;
             echo "Purchased ticket for event with ID {$eventID}. You are in section {$seatSectionID} with row {$row} and seat {$seatNo}.<br>";
-        }
+	    echo run_query($query);
+    }
         else
         {
             echo "Did not receive the expected input for purchasing tickets.<br>";
         }
 
-        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+        echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 
     function most_popular_venues()
     {
         if (isset($_POST['numVenues']))
         {
-            // TODO: Add query
             echo "List of {$_POST['numVenues']} most popular venue(s):<br>";
-            echo "Nothing so far! Must add query.<br>";
+	    $numVenues = $_POST['numVenues'];
+	    $query = 'SELECT V.name, VC.cnt FROM venue V, (SELECT V.venueID, COUNT(*) cnt FROM ticket_OwnsSeat_WithCustomer T, venue V GROUP BY V.venueID) VC WHERE ROWNUM <= '. $numVenues .' ORDER BY VC.cnt';   
+	
+            echo run_query($query);
         }
         else
         {
             echo "Did not receive the number of venues to return.<br>";
         }
 
-        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+        echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 
     function most_popular_events()
     {
         if (isset($_POST['numEvents']))
         {
-            // TODO: Add query
             echo "List of {$_POST['numEvents']} most popular event(s):<br>";
-            echo "Nothing so far! Must add query.<br>";
+	    $numEvents = $_POST['numEvents'];
+ 	    $query = 'SELECT EV.eventName, COUNT(*) FROM Event_atVenue EV, forAdmissionTo F, ticket_OwnsSeat_WithCustomer T WHERE F.eventID = EV.eventID AND T.isAvailable = 0 AND ROWNUM <= '. $numEvents .' GROUP BY EV.eventName';
+	    echo run_query($query);
         }
         else
         {
             echo "Did not receive the number of events to return.<br>";
         }
 
-        echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+        echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 
     function delete_account()
     {
         echo "Deleted user {$_SESSION['login_user']}.<br>";
-        unset($_SESSION['login_user']);
+	$username = $_SESSION['login_user'];
+        $query = 'DELETE FROM Organizer WHERE username = ' . $username;
+        $result = run_query($query); 
+ 	
+	unset($_SESSION['login_user']);
         session_destroy();
     }
 
@@ -168,14 +186,14 @@
                 break;
             default:
                 echo "Invalid operation.<br>";
-                echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+                echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
                 break;
         }
     }
     else
     {
          echo "Invalid operation.<br>";
-         echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+         echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
 ?>
 
