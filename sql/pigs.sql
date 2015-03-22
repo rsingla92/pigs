@@ -1,4 +1,8 @@
-SET SQLBLANKLINES ON
+SET SQLBLANKLINES ON;
+select object_name, s.sid, s.serial#  from v$locked_object l, dba_objects o, v$session s, v$process p where l.object_id = o.object_id and l.session_id = s.sid and s.paddr = p.addr;
+alter system kill session 'sid,serial#';--sid` and `serial#` get from step 1
+
+alter session set ddl_lock_timeout = 600;
 
 -- Drop existing tables
 drop table Venue CASCADE CONSTRAINTS;
@@ -12,7 +16,7 @@ drop table Organizes CASCADE CONSTRAINTS;
 drop table ForAdmissionTo CASCADE CONSTRAINTS;
 
 -- Create tables with their constraints
-CREATE TABLE Venue (venueID INT , name VARCHAR(255), address VARCHAR(255), cityName VARCHAR(255), provName VARCHAR(255), PRIMARY KEY (venueID), UNIQUE (address, cityName, provName));
+CREATE TABLE Venue (venueID INT , name VARCHAR(255), address VARCHAR(255), cityName VARCHAR(255), provName VARCHAR(255), oranizerID INT, PRIMARY KEY (venueID), UNIQUE (address, cityName, provName));
 CREATE SEQUENCE SEQ_VENUE START WITH 10 INCREMENT BY 1;
 
 CREATE TABLE Event_atVenue (venueID INT, eventID INT, eventName VARCHAR(255), basePrice INT, saleOpenDate TIMESTAMP, ticketStatus VARCHAR(255), startTime TIMESTAMP, endTime TIMESTAMP, PRIMARY KEY(eventID), UNIQUE (startTime, endTime, venueID));
@@ -34,8 +38,6 @@ CREATE SEQUENCE SEQ_TICKET START WITH 10 INCREMENT BY 1;
 
 CREATE TABLE Organizer (organizerID INT, firstName VARCHAR(255) NOT NULL, lastName VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, username VARCHAR(255), password VARCHAR(255), PRIMARY KEY(organizerID), UNIQUE(username), UNIQUE(email));
 CREATE SEQUENCE SEQ_ORGANIZER START WITH 10 INCREMENT BY 1;
-
-CREATE TABLE Organizes (organizerID INT, eventID INT, PRIMARY KEY(organizerID, eventID));
 
 CREATE TABLE ForAdmissionTo(eventID INT, ticketID INT, PRIMARY KEY(eventID, ticketID));
 
@@ -129,16 +131,6 @@ INSERT INTO organizer (organizerID, firstName, lastName, email, username, passwo
 (5, 'Kanye', 'Woot', 'kanye@gmail.com', 'kanye123', 'yay');
 
 
-INSERT INTO organizes (organizerID, eventID) VALUES -
-(5, 1);
-INSERT INTO organizes (organizerID, eventID) VALUES -
-(4, 2);
-INSERT INTO organizes (organizerID, eventID) VALUES -
-(3, 3);
-INSERT INTO organizes (organizerID, eventID) VALUES -
-(2, 4);
-INSERT INTO organizes (organizerID, eventID) VALUES -
-(1, 5);
 
 
 INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
@@ -264,14 +256,6 @@ ALTER TABLE foradmissionto -
 ADD CONSTRAINT foradmissionto_ibfk_1 FOREIGN KEY (eventID) REFERENCES event_atvenue (eventID);
 ALTER TABLE foradmissionto -
 ADD CONSTRAINT foradmissionto_ibfk_2 FOREIGN KEY (ticketID) REFERENCES Ticket_ownsSeat_WithCustomer (ticketID) ON DELETE CASCADE;
-
---
--- Constraints for table organizes
---
-ALTER TABLE organizes -
-ADD CONSTRAINT organizes_ibfk_1 FOREIGN KEY (organizerID) REFERENCES organizer (organizerID);
-ALTER TABLE organizes -
-ADD CONSTRAINT organizes_ibfk_2 FOREIGN KEY (eventID) REFERENCES event_atvenue (eventID);
 
 --
 -- Constraints for table seatingsection_invenue

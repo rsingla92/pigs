@@ -44,16 +44,10 @@ $organizerID = oci_result($result, 0);
         if (all_set($vals))
         {
           echo "Got venue with ID {$_POST['venueID']}, name {$_POST['name']}, and price {$_POST['basePrice']}.<br>";
-          $fmt = "INSERT INTO Event_atVenue VALUES (%s, SEQ_EVENT.NEXTVAL, '%s', %s, TO_TIMESTAMP('%s'), '%s', TO_TIMESTAMP('%s'), TO_TIMESTAMP('%s'))";
+          $fmt = "INSERT INTO Event_atVenue VALUES (%s, SEQ_EVENT.NEXTVAL, '%s', %s, TO_TIMESTAMP('%s'), '%s', TO_TIMESTAMP('%s'), TO_TIMESTAMP('%s'), %s)";
           $q = sprintf($fmt, $_POST['venueID'], $_POST['name'], $_POST['basePrice'],
-            $_POST['saleOpenTime'], 'Closed', $_POST['startTime'], $_POST['endTime']);
-          $r1 = get_html_table($q);
-
-          // Need to get created event id
-
-          $f2 = "INSERT INTO Ogranizes VALUES (%s, %s)";
-          //$q2 = sprintf($f2, $organizerID, $)
-
+            $_POST['saleOpenTime'], 'Closed', $_POST['startTime'], $_POST['endTime'], $organizerID);
+          echo get_html_table($q);
         }
         else
         {
@@ -245,6 +239,11 @@ $organizerID = oci_result($result, 0);
           echo "Num Events: {$_POST['numEvents']}.<br>";
           $fmt = "SELECT E.eventID, count(*) FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T WHERE E.eventID = FAT.eventID AND FAT.ticketID = T.ticketID AND ROWNUM <= %s GROUP BY E.eventID ORDER BY count(*)";
           $q = sprintf($fmt, $_POST['numEvents']);
+          echo get_html_table($q);
+
+          echo '<br>my events<br>';
+          $fmt = "SELECT E.eventID, count(*) FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T WHERE E.eventID = FAT.eventID AND FAT.ticketID = T.ticketID AND ROWNUM <= %s AND organizerID = %s GROUP BY E.eventID ORDER BY count(*)";
+          $q = sprintf($fmt, $_POST['numEvents'], organizerID);
           echo get_html_table($q);
         }
         else
