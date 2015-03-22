@@ -1,4 +1,6 @@
 <?php
+    include 'db.php';
+    
     function handle_login()
     {
        $user = trim($_POST['user']);
@@ -14,18 +16,46 @@
             return false;
         }
 
-        $hash_pass = sha1($pass); 
-        // TODO: Check if in DB, else return false.
+        echo "Attempting to login user: {$user}.<br>";
 
-        session_start();
-        $_SESSION['login_user'] = $user;
-        return true;
+        $q = "SELECT * FROM Customer WHERE username = '%s' AND password = '%s'";
+        $qe = sprintf($q, $user, $pass);
+
+        $num_rows = num_rows_in_select($qe);
+
+        if ($num_rows == 1)
+        {
+            session_start();
+            $_SESSION['login_user'] = $user;
+            $_SESSION['login_user_id'] = $userID; // TODO
+            return 'customer';
+        }
+    
+        $q = "SELECT * FROM Organizer WHERE username = '%s' AND password = '%s'";
+        $qe = sprintf($q, $user, $pass);
+
+        //echo get_html_table("SELECT * FROM Organizer"); // for debug only
+
+        $num_rows = num_rows_in_select($qe);
+
+        if ($num_rows == 1)
+        {
+            session_start();
+            $_SESSION['login_user'] = $user;
+            $_SESSION['login_user_id'] = $userID; // TODO
+            return 'organizer';
+        }
+        
+        return false;
     }
 
-    if (handle_login())
+    if (handle_login() == 'customer')
     {
-        // TODO: Base page on user type
-        header('Location: Customer.html');
+        header('Location: customer.html');
+    }
+    else if (handle_login() == 'organizer')
+    {
+        header('Location: organizer.html');
     }
     else
     {
@@ -37,6 +67,6 @@
         echo '<script type="text/javascript" src="view.js"></script>';
         echo '</head><body id="main_body" ><img id="top" src="top.png" alt=""><div id="form_container">';
         echo 'Invalid username and/or password.<br>.';
-        echo "Click <a href=\"loginForm.html\">here<//a> to try again.";
+        echo "Click <a href=\"login.html\">here<//a> to try again.";
     }
 ?>

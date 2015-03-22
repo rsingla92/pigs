@@ -12,6 +12,8 @@
     <div id="form_container">
 	
 <?php
+    include 'db.php';
+
     // Validate data 
     $email = $_POST["email"];
     $user = $_POST["user"];
@@ -22,28 +24,43 @@
     if (!filter_var($email, FILTER_VALIDATE_EMAIL))
     {
         echo "Invalid email supplied.<br>";
-        echo "Click <a href=\"CreateAccount.html\">here<//a> to try again.";
+        echo "Click <a href=\"register.html\">here<//a> to try again.";
     }
     else if ($user === '' || $first_name === '' || $last_name === '' || ($user_type <> 1 && $user_type <> 2))
     {
         echo "Invalid input to the registration form.<br>";
-        echo "Click <a href=\"CreateAccount.html\">here<//a> to try again.";
+        echo "Click <a href=\"register.html\">here<//a> to try again.";
     }
     else
     {
-        $pswd = sha1($_POST["password"]);
-        $pswd_confirm = sha1($_POST["password_confirm"]);
+        $pswd = $_POST["password"];
+        $pswd_confirm = $_POST["password_confirm"];
 
         if (strcmp($pswd, $pswd_confirm) !== 0) 
         {
             echo "Your password and confirmed password did not match.<br>";
-            echo "Click <a href=\"CreateAccount.html\">here<//a> to try again.";
+            echo "Click <a href=\"register.html\">here<//a> to try again.";
         }
         else
         {
             echo "Hello, {$first_name} {$last_name}. You have successfully created an account.<br>";
-            echo "Click <a href=\"loginForm.html\">here<//a> to login.";
-            // TODO: Store data in DB here
+            echo "Click <a href=\"login.html\">here<//a> to login.";
+            
+            if ($user_type == 1)
+            {
+                // customer
+                $q = "INSERT INTO customer VALUES (SEQ_CUSTOMER.NEXTVAL, '%s', '%s', '%s', '%s', '%s')";
+            }
+            else if ($user_type == 2)
+            {
+                // organizer
+                $q = "INSERT INTO organizer VALUES (SEQ_ORGANIZER.NEXTVAL, '%s', '%s', '%s', '%s', '%s')";
+            }
+
+            $qe = sprintf($q, $first_name, $last_name, $email, $user, $pswd);
+            $result = run_query($qe);
+            echo get_html_table("SELECT * FROM Customer");
+            echo get_html_table("SELECT * FROM Organizer");
         }
     }
 ?>

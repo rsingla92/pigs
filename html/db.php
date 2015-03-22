@@ -61,4 +61,33 @@ function get_html_table($query)
   $table = $table . "</table>\n";
   return $table;
 }
+
+function num_rows_in_select($selQuery)
+{
+  $c=oci_connect("ora_m8z7", "a43808104", "ug");
+  if ($c == false) {
+    echo "Unable to connect";
+  }
+  $parsed = oci_parse($c, $selQuery);
+  if ($parsed == false) {
+    echo "Parse error: {$query}";
+  }
+  $success = oci_execute($parsed);
+
+  if ($success) {
+    $numrows = oci_fetch_all($parsed, $garbage);
+    return $numrows;
+  }
+  echo "Execute error on: ${query}\n";
+  $e = oci_error($parsed);
+  echo "Error:";
+  print htmlentities($e['message']);
+  print "\n<pre>\n";
+  print htmlentities($e['sqltext']);
+  printf("\n%".($e['offset']+1)."s", "^");
+  print  "\n</pre>\n";
+
+  return $success;
+}
+
 ?>
