@@ -13,7 +13,12 @@
 <div id="form_container">
 
 <?php
-    include 'db.php';
+include 'db.php';
+$username = $_SESSION['login_user'];
+$a = "SELECT organizerID from Organizer WHERE username = '%s'";
+$q = sprintf($a, $username);
+$result = run_query($q);
+$organizerID = oci_result($result, 0);
 
     function get_post_default($k, $default)
     {
@@ -42,7 +47,13 @@
           $fmt = "INSERT INTO Event_atVenue VALUES (%s, SEQ_EVENT.NEXTVAL, '%s', %s, TO_TIMESTAMP('%s'), '%s', TO_TIMESTAMP('%s'), TO_TIMESTAMP('%s'))";
           $q = sprintf($fmt, $_POST['venueID'], $_POST['name'], $_POST['basePrice'],
             $_POST['saleOpenTime'], 'Closed', $_POST['startTime'], $_POST['endTime']);
-          echo run_query($q);
+          $r1 = get_html_table($q);
+
+          // Need to get created event id
+
+          $f2 = "INSERT INTO Ogranizes VALUES (%s, %s)";
+          //$q2 = sprintf($f2, $organizerID, $)
+
         }
         else
         {
@@ -59,7 +70,7 @@
            echo "Got venue with name {$_POST['name']}, address {$_POST['address']}, city {$_POST['city']}, province {$_POST['province']}.<br>";
            $q = "INSERT INTO Venue VALUES (SEQ_VENUE.NEXTVAL, '%s', '%s', '%s', '%s')";
            $qe = sprintf($q, $_POST['name'], $_POST['address'], $_POST['city'], $_POST['province']);
-           echo run_query($qe);
+           echo get_html_table($qe);
        }
        else
        {
@@ -79,7 +90,7 @@
             $venue = $_POST['venueID'];
             echo "Got new seating section w/ price {$price}, seats {$seats}. user type {$userType} and venue {$venue}.<br>";
             $query = 'INSERT INTO SeatingSection_inVenue (sectionID, venueID, additionalPrice, seatsAvailable, sectionSectionType) VALUES (SEQ_SECTION.NEXTVAL, '.$venue.',' . $price.','. $seats.','. $userType.')';
-            $result = run_query($query);
+            $result = get_html_table($query);
             echo $result;
         }
         else
@@ -101,7 +112,7 @@
             echo "Row {$row}, seat {$seat}, section {$section}, venue {$venue}.<br>";
             $fmt = "INSERT INTO Seat_inSection VALUES (%s, %s, %s, %s)";
             $q = sprintf($fmt, $section, $venue, $row, $seat);
-            echo run_query($q);
+            echo get_html_table($q);
         }
         else
         {
@@ -116,7 +127,7 @@
           echo "Event ID: {$_POST['eventID']}.<br>";
           $fmt = "DELETE FROM Event_atVenue WHERE eventID = %s";
           $q = sprintf($fmt, $_POST['eventID']);
-          echo run_query($q);
+          echo get_html_table($q);
         }
         else
         {
@@ -131,7 +142,7 @@
           echo "Venue ID: {$_POST['venueID']}.<br>";
           $fmt = "DELETE FROM Venue WHERE venueID = %s";
           $q = sprintf($fmt, $_POST['venueID']);
-          echo run_query($q);
+          echo get_html_table($q);
         }
         else
         {
@@ -146,7 +157,7 @@
           echo "Section ID: {$_POST['sectionID']}.<br>";
           $fmt = "DELETE FROM SeatingSection_inVenue WHERE sectionID = %s AND venueID = %s";
           $q = sprintf($fmt, $_POST['sectionID'], $_POST['venueID']);
-          echo run_query($q);
+          echo get_html_table($q);
         }
         else
         {
@@ -162,7 +173,7 @@
           echo "Row: {$_POST['row']}, Seat No: {$_POST['seatNo']}.<br>";
           $fmt = "DELETE FROM Seat_inSection WHERE sectionID = %s AND venueID = %s AND seat_row = %s AND seatNo = %s";
           $q = sprintf($fmt, $_POST['sectionID'], $_POST['venueID'], $_POST['row'], $_POST['seatNo']);
-          echo run_query($q);
+          echo get_html_table($q);
         }
         else
         {
@@ -178,7 +189,7 @@
           echo "Event ID: {$_POST['eventID']}.<br>";
           $fmt = "UPDATE Event_atVenue SET saleOpenDate = CURRENT_TIMESTAMP WHERE eventID = %s";
           $q = sprintf($fmt, $_POST['eventID']);
-          echo run_query($q);
+          echo get_html_table($q);
         }
         else
         {
@@ -189,27 +200,27 @@
  
     function view_all_events()
     {
-      echo run_query("SELECT * FROM Event_atVenue");
+      echo get_html_table("SELECT * FROM Event_atVenue");
     }
   
     function view_all_venues()
     {
-      echo run_query("SELECT * FROM Venue");
+      echo get_html_table("SELECT * FROM Venue");
     }
 
     function view_all_sections()
     {
-      echo run_query("SELECT * FROM SeatingSection_inVenue");
+      echo get_html_table("SELECT * FROM SeatingSection_inVenue");
     }
   
     function view_all_seats()
     {
-      echo run_query("SELECT * FROM Seat_inSection");
+      echo get_html_table("SELECT * FROM Seat_inSection");
     }
  
     function view_purchased_seats()
     {
-      echo run_query("SELECT * FROM Ticket_ownsSeat_WithCustomer");
+      echo get_html_table("SELECT * FROM Ticket_ownsSeat_WithCustomer");
     }
 
     function view_most_popular_venues()
@@ -219,7 +230,7 @@
           echo "Num venues: {$_POST['numVenues']}.<br>";
           $fmt = "SELECT V.venueID, count(*) as events FROM Venue V, Event_atVenue E WHERE V.venueID = E.venueID AND ROWNUM <= %s GROUP BY V.venueID ORDER BY count(*)";
           $q = sprintf($fmt, $_POST['numVenues']);
-          echo run_query($q);
+          echo get_html_table($q);
         }
         else
         {
@@ -234,7 +245,7 @@
           echo "Num Events: {$_POST['numEvents']}.<br>";
           $fmt = "SELECT E.eventID, count(*) FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T WHERE E.eventID = FAT.eventID AND FAT.ticketID = T.ticketID AND ROWNUM <= %s GROUP BY E.eventID ORDER BY count(*)";
           $q = sprintf($fmt, $_POST['numEvents']);
-          echo run_query($q);
+          echo get_html_table($q);
         }
         else
         {

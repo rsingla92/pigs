@@ -17,7 +17,7 @@ function run_query($query)
 
   $success = oci_execute($parsed);
   if ($success) {
-    return get_html_table($parsed);
+    return $parsed;
   }
   echo "Execute error on: ${query}\n";
   $e = oci_error($parsed);
@@ -32,8 +32,9 @@ function run_query($query)
 }
 
 // Get html table string from query results
-function get_html_table($parsed)
+function get_html_table($query)
 {
+  $parsed = run_query($query);
   $table = "<table border=\"1\">\n";
 
   // Header
