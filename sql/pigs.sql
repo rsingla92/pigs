@@ -19,7 +19,7 @@ drop table ForAdmissionTo CASCADE CONSTRAINTS;
 CREATE TABLE Venue (venueID INT , name VARCHAR(255), address VARCHAR(255), cityName VARCHAR(255), provName VARCHAR(255), oranizerID INT, PRIMARY KEY (venueID), UNIQUE (address, cityName, provName));
 CREATE SEQUENCE SEQ_VENUE START WITH 10 INCREMENT BY 1;
 
-CREATE TABLE Event_atVenue (venueID INT, eventID INT, eventName VARCHAR(255), basePrice INT, saleOpenDate TIMESTAMP, ticketStatus VARCHAR(255), startTime TIMESTAMP, endTime TIMESTAMP, PRIMARY KEY(eventID), UNIQUE (startTime, endTime, venueID));
+CREATE TABLE Event_atVenue (venueID INT, eventID INT, eventName VARCHAR(255), basePrice INT, saleOpenDate TIMESTAMP, ticketStatus VARCHAR(255), startTime TIMESTAMP, endTime TIMESTAMP, organizerID INT, PRIMARY KEY(eventID), UNIQUE (startTime, endTime, venueID));
 --ALTER TABLE Event_atVenue ADD CONSTRAINT fkv FOREIGN KEY (venueID) REFERENCES Venue (venueID) ON DELETE SET NULL;
 CREATE SEQUENCE SEQ_EVENT START WITH 10 INCREMENT BY 1;
 
