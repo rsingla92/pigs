@@ -34,7 +34,7 @@
         $q = "SELECT * FROM Organizer WHERE username = '%s' AND password = '%s'";
         $qe = sprintf($q, $user, $pass);
 
-        //echo get_html_table(run_query("SELECT * FROM Organizer")); // for debug only
+        //echo get_html_table("SELECT * FROM Organizer"); // for debug only
 
         $num_rows = num_rows_in_select($qe);
 

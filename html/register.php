@@ -12,6 +12,8 @@
     <div id="form_container">
 	
 <?php
+    include 'db.php';
+
     // Validate data 
     $email = $_POST["email"];
     $user = $_POST["user"];
@@ -22,12 +24,12 @@
     if (!filter_var($email, FILTER_VALIDATE_EMAIL))
     {
         echo "Invalid email supplied.<br>";
-        echo "Click <a href=\"CreateAccount.html\">here<//a> to try again.";
+        echo "Click <a href=\"register.html\">here<//a> to try again.";
     }
     else if ($user === '' || $first_name === '' || $last_name === '' || ($user_type <> 1 && $user_type <> 2))
     {
         echo "Invalid input to the registration form.<br>";
-        echo "Click <a href=\"CreateAccount.html\">here<//a> to try again.";
+        echo "Click <a href=\"register.html\">here<//a> to try again.";
     }
     else
     {
@@ -47,20 +49,18 @@
             if ($user_type == 1)
             {
                 // customer
-                $q = "INSERT INTO customer(userID, firstName, lastName, email, username, password) VALUES - (999, '%s', '%s', '%s', '%s', '%s')"; // TODO - change away from 999
+                $q = "INSERT INTO customer VALUES (SEQ_CUSTOMER.NEXTVAL, '%s', '%s', '%s', '%s', '%s')";
             }
             else if ($user_type == 2)
             {
                 // organizer
-                $q = "INSERT INTO organizer (organizerID, firstName, lastName, email, username, password) VALUES - (999, '%s', '%s', '%s', '%s', '%s')"; // TODO - change away from 999
+                $q = "INSERT INTO organizer VALUES (SEQ_ORGANIZER.NEXTVAL, '%s', '%s', '%s', '%s', '%s')";
             }
 
             $qe = sprintf($q, $first_name, $last_name, $email, $user, $pswd);
             $result = run_query($qe);
-            if ($result)
-            {
-                
-            }
+            echo get_html_table("SELECT * FROM Customer");
+            echo get_html_table("SELECT * FROM Organizer");
         }
     }
 ?>
