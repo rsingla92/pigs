@@ -15,6 +15,8 @@
 <?php
     include 'db.php';
 
+$userID = $_COOKIE['user_id'];
+
     function get_post_default($k, $default)
     {
         if (isset($_POST[$k])) return $_POST[$k];
@@ -97,10 +99,13 @@
 
             // TODO: Write query to purchase tickets.
             $query = 'INSERT INTO ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seat_no) '
-            $query .= 'VALUES (SEQ_TICKET.NEXTVAL,  
-	    $query = 'UPDATE ticket_ownsSeat_WithCustomer T SET T.isAvailable = 0 ';
-	    $query .= 'FROM ForAdmissionTo F WHERE F.eventID = ' . $eventID . ' AND ';
-            $query .= 'T.ticketID = F.ticketID AND T.seat_row = '. $row .' AND T.seatNo = '. $seatNo .' T.sectionID = '. $seatSectionID;
+            $query .= 'SELECT SEQ_TICKET.NEXTVAL, ' . $userID . ', \'F\', ' . $seatSectionID . ', E.venueID, ' . $row . ', ' . $seatNo . ' ';
+            $query .= 'FROM Event_atVenue E ';
+            $query .= 'WHERE E.eventID = ' . $eventID . ' AND NOT EXISTS (';
+            $query .= 'SELECT * FROM ticket_ownsSeat_WithCustomer T ';
+            $query .= 'WHERE T.venueID = E.venueID AND T.sectionID = ' . $seatSectionID . ' AND T.seat_row = ' . $row . ' ';
+            $query .= 'AND T.seat_no = ' . $seat_no . ' AND T.isAvailable = \'F\')';
+
             echo "Purchased ticket for event with ID {$eventID}. You are in section {$seatSectionID} with row {$row} and seat {$seatNo}.<br>";
 	    echo run_query($query);
     }
