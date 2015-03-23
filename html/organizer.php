@@ -89,7 +89,7 @@ echo sprintf("\nOrg: %s\n", $organizerID);
             $userType = $_POST['userType'];
             $venue = $_POST['venueID'];
             echo "Got new seating section w/ price {$price}, seats {$seats}. user type {$userType} and venue {$venue}.<br>";
-            $query = 'INSERT INTO SeatingSection_inVenue (sectionID, venueID, additionalPrice, seatsAvailable, seatingSectionType) VALUES (SEQ_SECTION.NEXTVAL, '.$venue.',' . $price.','. $seats.','. $userType.')';
+            $query = 'INSERT INTO SeatingSection_inVenue (sectionID, venueID, additionalPrice, seatsAvailable, sectionSectionType) VALUES (SEQ_SECTION.NEXTVAL, '.$venue.',' . $price.','. $seats.','. $userType.')';
             $result = get_html_table($query);
             echo $result;
         }
@@ -228,9 +228,49 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         if (isset($_POST['numVenues']))
         {
           echo "Num venues: {$_POST['numVenues']}.<br>";
-          $fmt = "SELECT V.venueID, count(*) as events FROM Venue V, Event_atVenue E WHERE V.venueID = E.venueID AND ROWNUM <= %s GROUP BY V.venueID ORDER BY count(*)";
+          $fmt = "SELECT V.venueID, count(*) as events 
+            FROM Venue V, Event_atVenue E 
+            WHERE V.venueID = E.venueID 
+              AND ROWNUM <= %s 
+            GROUP BY V.venueID 
+            ORDER BY count(*)";
           $q = sprintf($fmt, $_POST['numVenues']);
           echo get_html_table($q);
+
+          // Now doing that huge query
+          // Average events per venue, then the max or min of them
+          // Max Average Seats sold per venue
+          echo 'dumb';
+          $fmt = "
+            SELECT *
+            FROM (
+                WITH eventTicketsSold
+                AS
+                (SELECT eid, cnt
+                FROM
+                  ((SELECT E.eventID eid, count(*) cnt
+                    FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
+                    WHERE E.eventID = FAT.eventID 
+                    AND FAT.ticketID = T.ticketID 
+                    GROUP BY E.eventID)
+                  UNION
+                    (SELECT E2.eventID eid, 0 cnt
+                     FROM Event_atVenue E2
+                     WHERE E2.eventID NOT IN (SELECT E3.eventID FROM Event_atVenue E3, ForAdmissionTo FAT2, Ticket_ownsSeat_WithCustomer T2
+                                              WHERE E3.eventID = FAT2.eventID 
+                                                AND FAT2.ticketID = T2.ticketID)
+                     )
+                   )
+                )
+                SELECT V.venueID, avg(ETS.cnt) average, max(avg(ETS.cnt)) over (partition by V.venueID) as pcnt
+                FROM eventTicketsSold ETS, Event_atVenue E, Venue V
+                WHERE ETS.eid = E.eventID
+                  AND E.venueID = V.venueID
+                  GROUP BY V.venueID)
+            WHERE average = pcnt";
+          $q = sprintf($fmt, $_POST['numVenues']);
+          echo get_html_table($q);
+
         }
         else
         {
@@ -297,8 +337,9 @@ echo sprintf("\nOrg: %s\n", $organizerID);
     function delete_account()
     {
       // Don't know if this will work
-      $fmt = "DELETE FROM Organizer WHERE username = %s";
-      $q = sprintf($fmt, $_SESSION['login_user']);
+      $fmt = "DELETE FROM Organizer WHERE organizerID = %s";
+      $q = sprintf($fmt, $_COOKIE['organizer_id']);
+      echo run_query($q);
     }
 
     $action_num = intval(get_post_default('action', '0'));
