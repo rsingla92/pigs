@@ -28,7 +28,7 @@
         $eventYear = get_post_default('eventYear', ' ');
         $eventMonth = get_post_default('eventMonth', '');
 	
-	$query = 'SELECT * FROM Event_atVenue E, venue V WHERE E.venueID = V.venueID AND V.cityName LIKE \''."$eventCity" .'\' OR E.eventName LIKE \''.$eventName .'%\'';
+	$query = 'SELECT * FROM Event_atVenue E, venue V WHERE E.venueID = V.venueID AND V.cityName LIKE \'%'."$eventCity" .'%\' OR E.eventName LIKE \'%'.$eventName .'%\'';
         
 
 	echo "Results for events named {$eventName} on the month of {$eventMonth}, {$eventYear} in the city of {$eventCity}:<br>";
@@ -43,7 +43,7 @@
             $eventID = $_POST['eventID'];
           
             echo "Open sections for event with ID {$eventID}:<br>";
-	    $query = 'SELECT distinct seatingSectionType, E.venueID FROM event_AtVenue E, ticket_ownsSeat_WithCustomer T, seatingSection_inVenue S WHERE E.eventID = '. $eventID .' AND E.venueID = S.venueID AND S.seatsAvailable > 0';
+	    $query = 'SELECT distinct seatingSectionType, E.venueID FROM event_AtVenue E, seatingSection_inVenue S WHERE E.eventID = '. $eventID .' AND E.venueID = S.venueID AND S.seatsAvailable > 0';
 	     echo run_query($query);
 	 }
         else
@@ -61,8 +61,10 @@
             $eventID = $_POST['eventID'];
            
             echo "Open seats for event with ID {$eventID}:<br>";
-           
-	    $query = 'SELECT distinct T.seat_row, T.seatNo FROM ticket_OwnsSeat_WithCustomer T, Event_atVenue E WHERE T.venueID = E.venueID AND E.eventID = '. $eventID;
+            $query = "SELECT S.seat_row, S.seatNo FROM seat_inSection S, Event_atVenue E WHERE S.venueID = E.venueID AND E.eventID = {$eventID}";
+	    $query .= " EXCEPT ";
+	    $query .= "SELECT T.seat_row, T.seatNo FROM ticket_ownsSeat_WithCustomer T, event_atVenue E, ForAdmissionTo F WHERE T.isAvailable = FALSE AND F.eventID = E.eventID AND T.ticketID = F.ticketID AND E.eventID = {$eventID}";
+ 
 	    echo run_query($query);
         }
         else
@@ -94,9 +96,11 @@
             $seatNo = $_POST['seatNo'];
 
             // TODO: Write query to purchase tickets.
+            $query = 'INSERT INTO ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seat_no) '
+            $query .= 'VALUES (SEQ_TICKET.NEXTVAL,  
 	    $query = 'UPDATE ticket_ownsSeat_WithCustomer T SET T.isAvailable = 0 ';
-	    $query .= 'FROM ForAdmissionTo F WHERE F.eventID = ' .$eventID;
-            $query .= 'T.ticketID AND F.ticketID AND T.seat_row = '. $row .' AND T.seatNo = '. $seatNo .' T.sectionID = '. $seatSectionID;
+	    $query .= 'FROM ForAdmissionTo F WHERE F.eventID = ' . $eventID . ' AND ';
+            $query .= 'T.ticketID = F.ticketID AND T.seat_row = '. $row .' AND T.seatNo = '. $seatNo .' T.sectionID = '. $seatSectionID;
             echo "Purchased ticket for event with ID {$eventID}. You are in section {$seatSectionID} with row {$row} and seat {$seatNo}.<br>";
 	    echo run_query($query);
     }
