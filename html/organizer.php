@@ -14,15 +14,17 @@
 
 <?php
 include 'db.php';
-$username = $_COOKIE['login_user'];
-$a = "SELECT organizerID from Organizer WHERE username = '%s'";
-$q = sprintf($a, $username);
-$result = run_query($q);
-$row = oci_fetch_assoc($result);
-$organizerID = $row["ORGANIZERID"];
-echo "OrgID\n";
-echo $organizerID;
-echo "\n";
+//username = $_COOKIE['login_user'];
+//a = "SELECT organizerID from Organizer WHERE username = '%s'";
+//q = sprintf($a, $username);
+//result = run_query($q);
+//row = oci_fetch_assoc($result);
+//organizerID = $row["ORGANIZERID"];
+//cho "OrgID\n";
+//cho $organizerID;
+//cho "\n";
+$organizerID = $_COOKIE['organizer_id'];
+echo sprintf("\nOrg: %s\n", $organizerID);
 
     function get_post_default($k, $default)
     {
@@ -50,7 +52,7 @@ echo "\n";
           echo "Got venue with ID {$_POST['venueID']}, name {$_POST['name']}, and price {$_POST['basePrice']}.<br>";
           $fmt = "INSERT INTO Event_atVenue VALUES (%s, SEQ_EVENT.NEXTVAL, '%s', %s, TO_TIMESTAMP('%s'), '%s', TO_TIMESTAMP('%s'), TO_TIMESTAMP('%s'), %s)";
           $q = sprintf($fmt, $_POST['venueID'], $_POST['name'], $_POST['basePrice'],
-            $_POST['saleOpenTime'], 'Closed', $_POST['startTime'], $_POST['endTime'], $organizerID);
+            $_POST['saleOpenTime'], 'Closed', $_POST['startTime'], $_POST['endTime'], $_COOKIE['organizer_id']);
           echo get_html_table($q);
         }
         else
@@ -241,13 +243,41 @@ echo "\n";
         if (isset($_POST['numEvents']))
         {
           echo "Num Events: {$_POST['numEvents']}.<br>";
-          $fmt = "SELECT E.eventID, count(*) FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T WHERE E.eventID = FAT.eventID AND FAT.ticketID = T.ticketID AND ROWNUM <= %s GROUP BY E.eventID ORDER BY count(*)";
+          $fmt = "SELECT E.eventID, count(*) 
+            FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
+            WHERE E.eventID = FAT.eventID 
+            AND FAT.ticketID = T.ticketID 
+            AND ROWNUM <= %s 
+            GROUP BY E.eventID 
+            ORDER BY count(*)";
           $q = sprintf($fmt, $_POST['numEvents']);
           echo get_html_table($q);
 
           echo '<br>my events<br>';
-          $fmt = "SELECT E.eventID, count(*) FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T WHERE E.eventID = FAT.eventID AND FAT.ticketID = T.ticketID AND ROWNUM <= %s AND organizerID = %s GROUP BY E.eventID ORDER BY count(*)";
-          $q = sprintf($fmt, $_POST['numEvents'], organizerID);
+          $fmt = "
+            WITH
+            myEvents AS
+            (SELECT E2.eventID eid
+              FROM Event_atVenue E2
+              WHERE E2.organizerID = %s),
+            myEventSales AS
+             (SELECT E.eventID eid, count(*) cnt
+              FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
+              WHERE E.eventID = FAT.eventID 
+                AND FAT.ticketID = T.ticketID 
+                AND E.eventID IN myEvents
+                GROUP BY E.eventID),
+            noSales AS
+            (SELECT eventID eid, 0 cnt
+             FROM myEvents ME
+             WHERE ME.eid NOT IN (SELECT eid FROM myEventSales))
+            SELECT eid, cnt
+            FROM (myEventSales UNION noSales)
+            WHERE ROWNUM <= %s
+            ORDER BY cnt";
+          $organizerID = $_COOKIE['organizer_id'];
+          $q = sprintf($fmt, $organizerID, $organizerID, $_POST['numEvents']);
+          echo run_query($q);
           echo get_html_table($q);
         }
         else

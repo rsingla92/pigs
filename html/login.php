@@ -39,6 +39,12 @@
         if ($num_rows == 1)
         {
             setcookie('login_user', $user);
+            $a = "SELECT organizerID from Organizer WHERE username = '%s'";
+            $q = sprintf($a, $user);
+            $result = run_query($q);
+            $row = oci_fetch_assoc($result);
+            $organizerID = $row["ORGANIZERID"];
+            setcookie('organizer_id', $organizerID);
             return 'organizer';
         }
         
