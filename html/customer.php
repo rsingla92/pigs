@@ -98,7 +98,7 @@ $userID = $_COOKIE['user_id'];
             $seatNo = $_POST['seatNo'];
 
             // TODO: Write query to purchase tickets.
-            $query = 'INSERT INTO ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seat_no) '
+            $query = 'INSERT INTO ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seat_no) ';
             $query .= 'SELECT SEQ_TICKET.NEXTVAL, ' . $userID . ', \'F\', ' . $seatSectionID . ', E.venueID, ' . $row . ', ' . $seatNo . ' ';
             $query .= 'FROM Event_atVenue E ';
             $query .= 'WHERE E.eventID = ' . $eventID . ' AND NOT EXISTS (';
