@@ -42,7 +42,7 @@ CREATE SEQUENCE SEQ_CUSTOMER START WITH 10 INCREMENT BY 1;
 
 CREATE TABLE Ticket_ownsSeat_WithCustomer(ticketID INT, userID INT, isAvailable CHAR, sectionID INT, venueID INT, seat_row INT, seatNo INT, PRIMARY KEY (ticketID));
 --ALTER TABLE Ticket_ownsSeat_WithCustomer ADD CONSTRAINT ticket_ownsseat_ibfk_3 FOREIGN KEY (userID) REFERENCES Customer(userID) ON DELETE SET NULL;
-CREATE SEQUENCE SEQ_TICKET START WITH 10 INCREMENT BY 1;
+CREATE SEQUENCE SEQ_TICKET START WITH 20 INCREMENT BY 1;
 
 CREATE TABLE Organizer (organizerID INT, firstName VARCHAR(255) NOT NULL, lastName VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, username VARCHAR(255), password VARCHAR(255), PRIMARY KEY(organizerID), UNIQUE(username), UNIQUE(email));
 CREATE SEQUENCE SEQ_ORGANIZER START WITH 10 INCREMENT BY 1;
@@ -213,35 +213,35 @@ INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
 
 
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(1,1,0,1,1, 20, 5);
+(1,1,'F',1,1, 20, 5);
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(2,1,0,2,1, 20, 5);
+(2,1,'F',2,1, 20, 5);
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(3,1,0,3,1, 20, 5);
+(3,1,'F',3,1, 20, 5);
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(4,1,0,1,2, 20, 5);
+(4,1,'F',1,2, 20, 5);
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(5,2,0,2,2, 20, 5);
+(5,2,'F',2,2, 20, 5);
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(6,2,0,3,2, 20, 5);
+(6,2,'F',3,2, 20, 5);
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(7,2,0,1,3, 20, 5);
+(7,2,'F',1,3, 20, 5);
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(8,2,0,2,3, 20, 5);
+(8,2,'F',2,3, 20, 5);
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(9,3,0,3,3, 20, 5);
+(9,3,'F',3,3, 20, 5);
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(10,3,0,1,4, 20, 5);
+(10,3,'F',1,4, 20, 5);
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(11,3,0,2,4, 20, 5);
+(11,3,'F',2,4, 20, 5);
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(12,4,0,3,4, 20, 5);
+(12,4,'F',3,4, 20, 5);
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(13,4,0,1,5, 20, 5);
+(13,4,'F',1,5, 20, 5);
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(14,5,0,2,5, 20, 5);
+(14,5,'F',2,5, 20, 5);
 INSERT INTO Ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) VALUES - 
-(15,5,0,3,5, 20, 5);
+(15,5,'F',3,5, 20, 5);
 
 
 COMMIT;

@@ -94,6 +94,8 @@
             $seatNo = $_POST['seatNo'];
 
             // TODO: Write query to purchase tickets.
+            $query = 'INSERT INTO ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seat_no) '
+            $query .= 'VALUES (SEQ_TICKET.NEXTVAL,  
 	    $query = 'UPDATE ticket_ownsSeat_WithCustomer T SET T.isAvailable = 0 ';
 	    $query .= 'FROM ForAdmissionTo F WHERE F.eventID = ' . $eventID . ' AND ';
             $query .= 'T.ticketID = F.ticketID AND T.seat_row = '. $row .' AND T.seatNo = '. $seatNo .' T.sectionID = '. $seatSectionID;
