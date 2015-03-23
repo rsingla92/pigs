@@ -25,9 +25,7 @@
 
         if ($num_rows == 1)
         {
-            session_start();
             setcookie('login_user', $user);
-            $_SESSION['login_user_id'] = $userID; // TODO
             return 'customer';
         }
     
@@ -40,9 +38,7 @@
 
         if ($num_rows == 1)
         {
-            session_start();
             setcookie('login_user', $user);
-            $_SESSION['login_user_id'] = $userID; // TODO
             return 'organizer';
         }
         
