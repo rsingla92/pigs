@@ -27,7 +27,6 @@
         {
             session_start();
             $_SESSION['login_user'] = $user;
-            $_SESSION['login_user_id'] = $userID; // TODO
             return 'customer';
         }
     
@@ -42,7 +41,6 @@
         {
             session_start();
             $_SESSION['login_user'] = $user;
-            $_SESSION['login_user_id'] = $userID; // TODO
             return 'organizer';
         }
         
