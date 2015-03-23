@@ -244,13 +244,21 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         {
           echo "Num Events: {$_POST['numEvents']}.<br>";
           $fmt = "
-            SELECT * FROM (
-              SELECT E.eventID EventID, count(*) 
-              FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
-              WHERE E.eventID = FAT.eventID 
-              AND FAT.ticketID = T.ticketID 
-              GROUP BY E.eventID
-              ORDER BY count(*))
+            SELECT *
+            FROM
+              ((SELECT E.eventID eid, count(*) cnt
+                FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
+                WHERE E.eventID = FAT.eventID 
+                AND FAT.ticketID = T.ticketID 
+                GROUP BY E.eventID)
+              UNION
+                (SELECT E2.eventID eid, 0 cnt
+                 FROM Event_atVenue E2
+                 WHERE E2.eventID NOT IN (SELECT E3.eventID FROM Event_atVenue E3, ForAdmissionTo FAT2, Ticket_ownsSeat_WithCustomer T2
+                                          WHERE E3.eventID = FAT2.eventID 
+                                          AND FAT2.ticketID = T2.ticketID)
+                 )
+              ORDER BY cnt DESC)
             WHERE ROWNUM <= %s";
           $q = sprintf($fmt, $_POST['numEvents']);
           echo get_html_table($q);
@@ -274,7 +282,7 @@ echo sprintf("\nOrg: %s\n", $organizerID);
                                           AND FAT2.ticketID = T2.ticketID 
                                           AND E3.organizerID = %s)
                  AND E2.organizerID = %s)
-              ORDER BY cnt)
+              ORDER BY cnt DESC)
             WHERE ROWNUM <= %s";
           $q = sprintf($fmt, $organizerID, $organizerID, $organizerID, $_POST['numEvents']);
           echo run_query($q);
