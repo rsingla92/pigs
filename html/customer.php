@@ -63,7 +63,7 @@
             echo "Open seats for event with ID {$eventID}:<br>";
             $query = "SELECT S.seat_row, S.seatNo FROM seat_inSection S, Event_atVenue E WHERE S.venueID = E.venueID AND E.eventID = {$eventID}";
 	    $query .= " EXCEPT ";
-	    $query .= "SELECT T.seat_row, T.seatNo FROM ticket_ownsSeat_WithCustomer T, event_atVenue E, ForAdmissionTo F WHERE T.isAvailable = FALSE AND F.eventID = E.eventID AND T.ticketID = F.ticketID AND E.eventID = {$eventID}";
+	    $query .= "SELECT T.seat_row, T.seatNo FROM ticket_ownsSeat_WithCustomer T, event_atVenue E, ForAdmissionTo F WHERE T.isAvailable = F AND F.eventID = E.eventID AND T.ticketID = F.ticketID AND E.eventID = {$eventID}";
  
 	    echo run_query($query);
         }
