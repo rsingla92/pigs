@@ -243,39 +243,57 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         if (isset($_POST['numEvents']))
         {
           echo "Num Events: {$_POST['numEvents']}.<br>";
-          $fmt = "SELECT E.eventID, count(*) 
-            FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
-            WHERE E.eventID = FAT.eventID 
-            AND FAT.ticketID = T.ticketID 
-            AND ROWNUM <= %s 
-            GROUP BY E.eventID 
-            ORDER BY count(*)";
+          $fmt = "
+            SELECT * FROM (
+              SELECT E.eventID EventID, count(*) 
+              FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
+              WHERE E.eventID = FAT.eventID 
+              AND FAT.ticketID = T.ticketID 
+              GROUP BY E.eventID
+              ORDER BY count(*))
+            WHERE ROWNUM <= %s";
           $q = sprintf($fmt, $_POST['numEvents']);
           echo get_html_table($q);
 
           echo '<br>my events<br>';
-          $fmt = "
-            WITH
-            myEvents AS
-            (SELECT E2.eventID eid
-              FROM Event_atVenue E2
-              WHERE E2.organizerID = %s),
-            myEventSales AS
-             (SELECT E.eventID eid, count(*) cnt
-              FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
-              WHERE E.eventID = FAT.eventID 
-                AND FAT.ticketID = T.ticketID 
-                AND E.eventID IN myEvents
-                GROUP BY E.eventID),
-            noSales AS
-            (SELECT eventID eid, 0 cnt
-             FROM myEvents ME
-             WHERE ME.eid NOT IN (SELECT eid FROM myEventSales))
-            SELECT eid, cnt
-            FROM (myEventSales UNION noSales)
-            WHERE ROWNUM <= %s
-            ORDER BY cnt";
           $organizerID = $_COOKIE['organizer_id'];
+          //$fmt = "
+          //  WITH eventTickets AS
+          //  (SELECT E.eventID eid, count(*) cnt
+          //  FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
+          //  WHERE E.eventID = FAT.eventID 
+          //  AND FAT.ticketID = T.ticketID 
+          //  AND E.organizerID = %s
+          //  GROUP BY E.eventID),
+          //  noEventTickets AS
+          //  (SELECT E2.eventID eid, 0 cnt
+          //   FROM Event_atVenue E2
+          //   WHERE E2.eventID NOT IN (SELECT eid FROM eventTickets)
+          //   AND E2.organizerID = %s)
+          //  SELECT *
+          //  FROM (eventTickets UNION noEventTickets)
+          //  WHERE ROWNUM <= %s
+          //  ORDER BY cnt
+          //  ";
+          $fmt = "
+            SELECT *
+            FROM
+            ((SELECT E.eventID eid, count(*) cnt
+            FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
+            WHERE E.eventID = FAT.eventID 
+            AND FAT.ticketID = T.ticketID 
+            AND E.organizerID = %s
+            GROUP BY E.eventID)
+            UNION
+            (SELECT E2.eventID eid, 0 cnt
+             FROM Event_atVenue E2
+              WHERE E2.eventID NOT IN (SELECT E2.eventID FROM Event_atVenue E2, ForAdmissionTo FAT2, Ticket_ownsSeat_WithCustomer T2
+                    WHERE E2.eventID = FAT2.eventID 
+                    AND FAT2.ticketID = T2.ticketID 
+                    AND E2.organizerID = %s)
+             AND E2.organizerID = %s)
+            ORDER BY cnt)
+            WHERE ROWNUM <= %s";
           $q = sprintf($fmt, $organizerID, $organizerID, $_POST['numEvents']);
           echo run_query($q);
           echo get_html_table($q);
