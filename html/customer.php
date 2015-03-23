@@ -45,7 +45,7 @@ $userID = $_COOKIE['user_id'];
             $eventID = $_POST['eventID'];
           
             echo "Open sections for event with ID {$eventID}:<br>";
-	    $query = 'SELECT distinct sectionSectionType, E.venueID FROM event_AtVenue E, seatingSection_inVenue S WHERE E.eventID = '. $eventID .' AND E.venueID = S.venueID AND S.seatsAvailable > 0';
+	    $query = 'SELECT distinct seatingSectionType, E.venueID FROM event_AtVenue E, seatingSection_inVenue S WHERE E.eventID = '. $eventID .' AND E.venueID = S.venueID AND S.seatsAvailable > 0';
 	     echo run_query($query);
 	 }
         else
