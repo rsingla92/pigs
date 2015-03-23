@@ -14,11 +14,15 @@
 
 <?php
 include 'db.php';
-$username = $_SESSION['login_user'];
+$username = $_COOKIE['login_user'];
 $a = "SELECT organizerID from Organizer WHERE username = '%s'";
 $q = sprintf($a, $username);
 $result = run_query($q);
-$organizerID = oci_result($result, 0);
+$row = oci_fetch_assoc($result);
+$organizerID = $row["ORGANIZERID"];
+echo "OrgID\n";
+echo $organizerID;
+echo "\n";
 
     function get_post_default($k, $default)
     {
