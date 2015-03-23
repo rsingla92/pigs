@@ -27,20 +27,20 @@ drop SEQUENCE SEQ_ORGANIZER;
 CREATE TABLE Venue (venueID INT , name VARCHAR(255), address VARCHAR(255), cityName VARCHAR(255), provName VARCHAR(255), oranizerID INT, PRIMARY KEY (venueID), UNIQUE (address, cityName, provName));
 CREATE SEQUENCE SEQ_VENUE START WITH 10 INCREMENT BY 1;
 
-CREATE TABLE Event_atVenue (venueID INT, eventID INT, eventName VARCHAR(255), basePrice INT, saleOpenDate TIMESTAMP, ticketStatus VARCHAR(255), startTime TIMESTAMP, endTime TIMESTAMP, organizerID INT, PRIMARY KEY(eventID), UNIQUE (startTime, endTime, venueID));
+CREATE TABLE Event_atVenue (venueID INT, eventID INT, eventName VARCHAR(255), basePrice INT, saleOpenDate TIMESTAMP, ticketStatus VARCHAR(255), startTime TIMESTAMP, endTime TIMESTAMP, organizerID INT, PRIMARY KEY(eventID), UNIQUE (startTime, endTime, venueID), CONSTRAINT eavC CHECK (basePrice >= 0));
 --ALTER TABLE Event_atVenue ADD CONSTRAINT fkv FOREIGN KEY (venueID) REFERENCES Venue (venueID) ON DELETE SET NULL;
 CREATE SEQUENCE SEQ_EVENT START WITH 10 INCREMENT BY 1;
 
-CREATE TABLE SeatingSection_inVenue (venueID INT, sectionID INT NOT NULL , additionalPrice INT, seatsAvailable INT NOT NULL, sectionSectionType INT NOT NULL, PRIMARY KEY (sectionID, venueID));
+CREATE TABLE SeatingSection_inVenue (venueID INT, sectionID INT NOT NULL , additionalPrice INT, seatsAvailable INT NOT NULL, seatingSectionType INT NOT NULL, PRIMARY KEY (sectionID, venueID), CONSTRAINT ssivC1 CHECK (additionalPrice >= 0), CONSTRAINT ssivC2 CHECK (seatsAvailable >= 0));
 CREATE SEQUENCE SEQ_SECTION START WITH 10 INCREMENT BY 1;
 
-CREATE TABLE Seat_inSection (sectionID INT, venueID INT, seat_row INT, seatNo INT, PRIMARY KEY (sectionID, venueID, seat_row, seatNo));
+CREATE TABLE Seat_inSection (sectionID INT, venueID INT, seat_row INT, seatNo INT, PRIMARY KEY (sectionID, venueID, seat_row, seatNo), CONSTRAINT sisC1 CHECK (seat_row >= 0), CONSTRAINT sisC2 CHECK (seatNo >= 0));
 CREATE SEQUENCE SEQ_SEAT START WITH 10 INCREMENT BY 1;
 
 CREATE TABLE Customer (userID INT, firstName VARCHAR(255), lastName VARCHAR(255), email VARCHAR(255), username VARCHAR(255), password VARCHAR(255), PRIMARY KEY(userID), UNIQUE(email), UNIQUE(username));
 CREATE SEQUENCE SEQ_CUSTOMER START WITH 10 INCREMENT BY 1;
 
-CREATE TABLE Ticket_ownsSeat_WithCustomer(ticketID INT, userID INT, isAvailable CHAR, sectionID INT, venueID INT, seat_row INT, seatNo INT, PRIMARY KEY (ticketID));
+CREATE TABLE Ticket_ownsSeat_WithCustomer(ticketID INT, userID INT, isAvailable CHAR, sectionID INT, venueID INT, seat_row INT, seatNo INT, PRIMARY KEY (ticketID), CONSTRAINT toswcC1 CHECK (seat_row >= 0), CONSTRAINT toswcC2 CHECK (seatNo >= 0));
 --ALTER TABLE Ticket_ownsSeat_WithCustomer ADD CONSTRAINT ticket_ownsseat_ibfk_3 FOREIGN KEY (userID) REFERENCES Customer(userID) ON DELETE SET NULL;
 CREATE SEQUENCE SEQ_TICKET START WITH 10 INCREMENT BY 1;
 
@@ -141,39 +141,39 @@ INSERT INTO organizer (organizerID, firstName, lastName, email, username, passwo
 
 
 
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (1, 1, 10, 50, 1);
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (1, 2, 20, 50, 2);
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (1, 3, 30, 50, 3);
 
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (2, 1, 10, 50, 1);
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (2, 2, 20, 50, 2);
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (2, 3, 30, 50, 3);
 
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (3, 1, 10, 50, 1);
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (3, 2, 20, 50, 2);
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (3, 3, 30, 50, 3);
 
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (4, 1, 10, 50, 1);
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (4, 2, 20, 50, 2);
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (4, 3, 30, 50, 3);
 
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (5, 1, 10, 50, 1);
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (5, 2, 20, 50, 2);
-INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, sectionSectionType) VALUES -
+INSERT INTO seatingsection_invenue (venueID, sectionID, additionalPrice, seatsAvailable, seatingSectionType) VALUES -
 (5, 3, 30, 50, 3);
 
 INSERT INTO seat_insection (sectionID, venueID, seat_row, seatNo) VALUES -
