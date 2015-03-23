@@ -26,6 +26,12 @@
         if ($num_rows == 1)
         {
             setcookie('login_user', $user);
+            $a = "SELECT userID from Customer WHERE username = '%s'";
+            $q = sprintf($a, $user);
+            $result = run_query($q);
+            $row = oci_fetch_assoc($result);
+            $userID = $row["USERID"];
+            setcookie('user_id', $userID);
             return 'customer';
         }
     
