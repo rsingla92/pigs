@@ -48,8 +48,19 @@ echo "<br>";
                       'startTime',
                       'endTime',
                       'saleOpenTime');
+
         if (all_set($vals))
         {
+	  // do not check the name of the venue.
+	  if(!is_numeric($_POST['venueID']) || !is_numeric($_POST['basePrice'])
+		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}',$_POST['startTime'])
+		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}',$_POST['endTime']) 
+		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}',$_POST['saleOpenTime']))
+	  {
+		echo "Please check the types of your entries! An error may occur!<br>";
+		return;
+	  }
+
           echo "Got venue with ID {$_POST['venueID']}, name {$_POST['name']}, and price {$_POST['basePrice']}.<br>";
           $fmt = "INSERT INTO Event_atVenue VALUES (%s, SEQ_EVENT.NEXTVAL, '%s', %s, TO_TIMESTAMP('%s'), '%s', TO_TIMESTAMP('%s'), TO_TIMESTAMP('%s'), %s)";
           $q = sprintf($fmt, $_POST['venueID'], $_POST['name'], $_POST['basePrice'],
@@ -68,6 +79,13 @@ echo "<br>";
        
        if (all_set($vals))
        {
+		// do not check the name of the venue or address
+	   if(!ctype_alnum($_POST['city'] || !ctype_alnum($_POST['province'])))
+	   {
+		echo "Please check the types of your entries! An error may occur!<br>";
+		return;
+	   }
+
            echo "Got venue with name {$_POST['name']}, address {$_POST['address']}, city {$_POST['city']}, province {$_POST['province']}.<br>";
            $q = "INSERT INTO Venue VALUES (SEQ_VENUE.NEXTVAL, '%s', '%s', '%s', '%s')";
            $qe = sprintf($q, $_POST['name'], $_POST['address'], $_POST['city'], $_POST['province']);
@@ -89,6 +107,13 @@ echo "<br>";
             $seats = $_POST['seatsAvailable'];
             $userType = $_POST['userType'];
             $venue = $_POST['venueID'];
+	
+	    if(!is_numeric($price) || !$is_numeric($seatsAvailable) || !ctype_alnum($userType) || !is_numeric($venue))
+	    {
+		echo "Please check the types of your entries! An error may occur!<br>";
+		return;
+            }
+
             echo "Got new seating section w/ price {$price}, seats {$seats}. user type {$userType} and venue {$venue}.<br>";
             $query = 'INSERT INTO SeatingSection_inVenue (sectionID, venueID, additionalPrice, seatsAvailable, sectionSectionType) VALUES (SEQ_SECTION.NEXTVAL, '.$venue.',' . $price.','. $seats.','. $userType.')';
             $result = get_html_table($query);
@@ -110,6 +135,12 @@ echo "<br>";
             $seat = $_POST['seatNo'];
             $section = $_POST['sectionID'];
             $venue = $_POST['venueID'];
+
+	    if( !is_numeric($row) || !is_numeric($seat) || !is_numeric($section) || !is_numeric($venue))
+	    {
+	    	echo "Please check the types of your entries! An error may occur!<br>";
+		return;		
+            } 
             echo "Row {$row}, seat {$seat}, section {$section}, venue {$venue}.<br>";
             $fmt = "INSERT INTO Seat_inSection VALUES (%s, %s, %s, %s)";
             $q = sprintf($fmt, $section, $venue, $row, $seat);
@@ -126,6 +157,12 @@ echo "<br>";
         if (isset($_POST['eventID']))
         {
           echo "Event ID: {$_POST['eventID']}.<br>";
+
+	  if( !is_numeric($eventID) )
+	  {
+	  	echo "Please check the types of your entries! An error may occur!<br>";
+		return;		
+	  }
           $fmt = "DELETE FROM Event_atVenue WHERE eventID = %s";
           $q = sprintf($fmt, $_POST['eventID']);
           echo get_html_table($q);
@@ -141,6 +178,11 @@ echo "<br>";
         if (isset($_POST['venueID']))
         {
           echo "Venue ID: {$_POST['venueID']}.<br>";
+          if( !is_numeric($venueID) )
+	  {
+	  	echo "Please check the types of your entries! An error may occur!<br>";
+		return;		
+	  }
           $fmt = "DELETE FROM Venue WHERE venueID = %s";
           $q = sprintf($fmt, $_POST['venueID']);
           echo get_html_table($q);
@@ -156,6 +198,12 @@ echo "<br>";
       if (isset($_POST['venueID'], $_POST['sectionID']))
         {
           echo "Section ID: {$_POST['sectionID']}.<br>";
+          if( !is_numeric($_POST['venueID']) || !is_numeric($_POST['sectionID']) )
+          {
+            echo "Please check the types of your entries! An error may occur!<br>";
+            return;		
+          }
+
           $fmt = "DELETE FROM SeatingSection_inVenue WHERE sectionID = %s AND venueID = %s";
           $q = sprintf($fmt, $_POST['sectionID'], $_POST['venueID']);
           echo get_html_table($q);
@@ -172,6 +220,12 @@ echo "<br>";
         if (isset($_POST['row']) && isset($_POST['seatNo']))
         {
           echo "Row: {$_POST['row']}, Seat No: {$_POST['seatNo']}.<br>";
+	  if( !is_numeric($_POST['row']) || !is_numeric($_POST['seatNo']) )
+	  {
+	  	echo "Please check the types of your entries! An error may occur!<br>";
+		return;		
+	  }
+          
           $fmt = "DELETE FROM Seat_inSection WHERE sectionID = %s AND venueID = %s AND seat_row = %s AND seatNo = %s";
           $q = sprintf($fmt, $_POST['sectionID'], $_POST['venueID'], $_POST['row'], $_POST['seatNo']);
           echo get_html_table($q);
@@ -188,6 +242,12 @@ echo "<br>";
         if (isset($_POST['eventID']))
         {
           echo "Event ID: {$_POST['eventID']}.<br>";
+
+	  if(!is_numeric($_POST['eventID']))
+	  {
+	   	echo "Please check the types of your entries! An error may occur!<br>";
+		return;		
+	  }
           $fmt = "UPDATE Event_atVenue SET saleOpenDate = CURRENT_TIMESTAMP WHERE eventID = %s";
           $q = sprintf($fmt, $_POST['eventID']);
           echo get_html_table($q);
@@ -221,7 +281,7 @@ echo "<br>";
  
     function view_purchased_seats()
     {
-      echo get_html_table("SELECT * FROM Ticket_ownsSeat_WithCustomer");
+      echo get_html_table("SELECT * FROM Ticket_ownsSeat_WithCustomer NATURAL JOIN ForAdmissionTo");
     }
 
     function view_most_popular_venues()
@@ -229,6 +289,13 @@ echo "<br>";
         if (isset($_POST['numVenues']))
         {
           echo "Num venues: {$_POST['numVenues']}.<br>";
+
+   	  if(!is_numeric($_POST['numVenues']))
+	  {
+	     echo "Please check the types of your entries! An error may occur!<br>";
+	     return;		
+	  }
+
           $fmt = "SELECT V.venueID, count(*) as events 
             FROM Venue V, Event_atVenue E 
             WHERE V.venueID = E.venueID 
@@ -246,7 +313,7 @@ echo "<br>";
             echo 'Need min or max only, got ' . $mm;
             return;
           }
-          echo 'dumb';
+          echo 'For each venue, there is an average number of seats sold for events at that venue. Select the max or min of these averages.';
           $fmt = "
             WITH eventTicketsSold
             AS
@@ -294,6 +361,12 @@ echo "<br>";
         if (isset($_POST['numEvents']))
         {
           echo "Num Events: {$_POST['numEvents']}.<br>";
+
+        if(!is_numeric($_POST['numEvents']))
+        {
+           echo "Please check the types of your entries! An error may occur!<br>";
+           return;		
+        }
           $fmt = "
             SELECT *
             FROM
@@ -415,8 +488,35 @@ echo "<br>";
         }
     }
 
+    function find_superfans()
+    {
+      echo "Fans";
+      $fmt = "
+        WITH
+        customerEvents
+        AS
+        (SELECT DISTINCT C.userID, E.eventID
+        FROM Customer C, Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T
+        WHERE E.eventID = FAT.eventID
+          AND FAT.ticketID = T.ticketID
+          AND T.userID = C.userID
+        )
+        SELECT CE.userID
+        FROM customerEvents CE
+        WHERE CE.eventID IN (SELECT eventID eventID
+                             FROM Event_atVenue
+                             WHERE eventName = '%s')
+        GROUP BY CE.userID
+        HAVING count(*) = (SELECT count(*)
+                           FROM Event_atVenue 
+                           WHERE eventName = '%s')
+        ";
+      $q = sprintf($fmt, $_POST['eventName'], $_POST['eventName']);
+      echo get_html_table($q);
+    }
+
     $action_num = intval(get_post_default('action', '0'));
-    if ($action_num >= 1 && $action_num <= 19)
+    if ($action_num >= 1 && $action_num <= 20)
     {
         //echo "Action num: {$action_num}.<br>";
         switch ($action_num)
@@ -477,6 +577,8 @@ echo "<br>";
                 break;
             case 19:
                 changeBasePrice();
+            case 20:
+                find_superfans();
                 break;
             default:
                 echo "Invalid operation.<br>";

@@ -26,8 +26,20 @@
     {
         $eventCity = get_post_default('eventCity', ' '); 
         $eventName = get_post_default('eventName', ' ');
+
+	    // do not check event name	
+	    if(!ctype_alnum($eventCity))
+	    {
+	        echo "Please check the types of your entries. An error may occur!<br>";
+	        return;
+	    }
 	
-	$query = 'SELECT * FROM Event_atVenue E, venue V WHERE E.venueID = V.venueID AND V.cityName LIKE \'%'."$eventCity" .'%\' OR E.eventName LIKE \'%'.$eventName .'%\'';
+        $query = "SELECT E.eventID, E.venueID, E.eventName, E.basePrice, V.name, V.cityName, E.startTime 
+                  FROM Event_atVenue E, venue V 
+                  WHERE E.venueID = V.venueID AND 
+                  (V.cityName LIKE '{$eventCity}' 
+                   OR E.eventName LIKE '{$eventName}'
+                   OR (EXTRACT (YEAR FROM E.startTime ) = {$eventYear} AND EXTRACT (MONTH FROM E.startTime) = {$eventMonth}))";
 
 	echo "Results for events:<br>";
 	echo get_html_table($query);
@@ -41,6 +53,13 @@
             $eventID = $_POST['eventID'];
           
             echo "Open sections for event with ID {$eventID}:<br>";
+
+	    if(!is_numeric($eventID))
+	    {
+	   	echo "Please check the types of your entries. An error may occur!<br>";
+	    	return;
+	
+	    }
 	    $query = 'SELECT distinct seatingSectionType, E.venueID FROM event_AtVenue E, seatingSection_inVenue S WHERE E.eventID = '. $eventID .' AND E.venueID = S.venueID AND S.seatsAvailable > 0';
 	     echo get_html_table($query);
 	 }
@@ -57,7 +76,13 @@
         if (isset($_POST['eventID']))
         {
             $eventID = $_POST['eventID'];
-           
+ 
+	    if(!is_numeric($eventID))
+	    {
+	   	echo "Please check the types of your entries. An error may occur!<br>";
+	    	return;
+	
+	    }          
             echo "Open seats for event with ID {$eventID}:<br>";
             $query = "SELECT S.seat_row, S.seatNo FROM seat_inSection S, Event_atVenue E WHERE S.venueID = E.venueID AND E.eventID = {$eventID}";
 	    $query .= " MINUS ";
@@ -76,9 +101,9 @@
     function view_purchased_tickets()
     {
         // TODO: Query to find purchased tickets
-        echo "Purchased tickets for customer with username {$_SESSION['login_user']}:<br>";
-        $username = $_SESSION['login_user'];
-	$query = 'SELECT seat_row, seatNo FROM ticket_ownsSeat_WithCustomers T, customer C WHERE T.userID = C.userID AND C.username = '. $username ;
+        echo "Purchased tickets for customer with username {$_COOKIE['login_user']}:<br>";
+        $username = $_COOKIE['login_user'];
+	$query = "SELECT seat_row, seatNo FROM ticket_ownsSeat_WithCustomer T, customer C WHERE T.userID = C.userID AND C.username = '{$username}'";
 	echo get_html_table($query);
         echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
@@ -93,6 +118,13 @@
             $row = $_POST['row'];
             $seatNo = $_POST['seatNo'];
             $userID = $_COOKIE['user_id'];
+
+	    if(!is_numeric($eventID) || !$is_numeric($seatSectionID) || !is_numeric($row) || !is_numeric($seatNo))
+	    {
+	   	echo "Please check the types of your entries. An error may occur!<br>";
+	    	return;
+	    } 
+
 
             // TODO: Write query to purchase tickets.
             $query = 'INSERT INTO ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) ';
@@ -119,8 +151,20 @@
         if (isset($_POST['numVenues']))
         {
             echo "List of {$_POST['numVenues']} most popular venue(s):<br>";
+	
+	    if(!is_numeric($_POST['numVenues']))
+	    {
+	   	echo "Please check the types of your entries. An error may occur!<br>";
+	    	return;
+	    } 
+
 	    $numVenues = $_POST['numVenues'];
-	    $query = 'SELECT V.name, VC.cnt FROM venue V, (SELECT V.venueID, COUNT(*) cnt FROM ticket_OwnsSeat_WithCustomer T, venue V GROUP BY V.venueID) VC WHERE ROWNUM <= '. $numVenues .' ORDER BY VC.cnt';   
+	    $query = "SELECT V1.name, VC.cnt 
+                      FROM venue V1, (SELECT T.venueID, COUNT(*) cnt 
+                                      FROM ticket_OwnsSeat_WithCustomer T
+                                      GROUP BY T.venueID) VC 
+                      WHERE V1.venueID = VC.venueID AND ROWNUM <= {$numVenues}
+                      ORDER BY VC.cnt DESC";   
 	
             echo get_html_table($query);
         }
@@ -136,10 +180,33 @@
     {
         if (isset($_POST['numEvents']))
         {
-            echo "List of {$_POST['numEvents']} most popular event(s):<br>";
-	    $numEvents = $_POST['numEvents'];
- 	    $query = 'SELECT EV.eventName, COUNT(*) FROM Event_atVenue EV, forAdmissionTo F, ticket_OwnsSeat_WithCustomer T WHERE F.eventID = EV.eventID AND T.isAvailable = 0 AND ROWNUM <= '. $numEvents .' GROUP BY EV.eventName';
-	    echo get_html_table($query);
+          echo "Num Events: {$_POST['numEvents']}.<br>";
+
+            if(!is_numeric($_POST['numEvents']))
+            {
+               echo "Please check the types of your entries! An error may occur!<br>";
+               return;		
+            }
+
+          $fmt = "
+            SELECT *
+            FROM
+              ((SELECT E.eventID eid, count(*) cnt
+                FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
+                WHERE E.eventID = FAT.eventID 
+                AND FAT.ticketID = T.ticketID 
+                GROUP BY E.eventID)
+              UNION
+                (SELECT E2.eventID eid, 0 cnt
+                 FROM Event_atVenue E2
+                 WHERE E2.eventID NOT IN (SELECT E3.eventID FROM Event_atVenue E3, ForAdmissionTo FAT2, Ticket_ownsSeat_WithCustomer T2
+                                          WHERE E3.eventID = FAT2.eventID 
+                                          AND FAT2.ticketID = T2.ticketID)
+                 )
+              ORDER BY cnt DESC)
+            WHERE ROWNUM <= %s";
+          $q = sprintf($fmt, $_POST['numEvents']);
+          echo get_html_table($q);
         }
         else
         {
@@ -151,12 +218,12 @@
 
     function delete_account()
     {
-        echo "Deleted user {$_SESSION['login_user']}.<br>";
-	$username = $_SESSION['login_user'];
+        echo "Deleted user {$_COOKIE['login_user']}.<br>";
+	$username = $_COOKIE['login_user'];
         $query = 'DELETE FROM Organizer WHERE username = ' . $username;
         $result = get_html_table($query); 
  	
-	unset($_SESSION['login_user']);
+	unset($_COOKIE['login_user']);
         session_destroy();
     }
 
