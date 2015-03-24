@@ -12,7 +12,6 @@ drop table Seat_inSection CASCADE CONSTRAINTS;
 drop table Ticket_ownsSeat_WithCustomer CASCADE CONSTRAINTS;
 drop table Customer CASCADE CONSTRAINTS;
 drop table Organizer CASCADE CONSTRAINTS;
-drop table Organizes CASCADE CONSTRAINTS;
 drop table ForAdmissionTo CASCADE CONSTRAINTS;
 
 drop SEQUENCE SEQ_VENUE;

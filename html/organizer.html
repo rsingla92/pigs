@@ -119,6 +119,7 @@
 			<p></p>
 		</li>
 		<form method="post" action="organizer.php">
+			At Venue (id): <br> <input type="text" name="venueID"><br>
 			Section (ID): <br> <input type="text" name="sectionID"><br>
 		        <input type="hidden" name="action" value="7">	
 			<input type="submit" value="Delete">
@@ -129,6 +130,8 @@
 			<p></p>
 		</li>
 		<form method="post" action="organizer.php">
+			At Venue (id): <br> <input type="text" name="venueID"><br>
+			Section (ID): <br> <input type="text" name="sectionID"><br>
 			Seat Row: <br> <input type="text" name="row"><br>
 			Seat Number: <br> <input type="text" name="seatNo"><br>
 		        <input type="hidden" name="action" value="8">	
@@ -196,7 +199,8 @@
 		</li>
 		<form method="post" action="organizer.php">
 			Number Venues: <br> <input type="text" name="numVenues"><br>
-		        <input type="hidden" name="action" value="15">	
+      <input type="hidden" name="action" value="15">	
+      Aggregate min/max? <input type="text" name="minmax"><br>
 			<input type="submit" value="Submit">
 		</form>
 		
@@ -224,11 +228,21 @@
 			<p></p>
 		</li>
 		<form method="post" action="organizer.php">
-            This will delete all tickets to the event, and create available tickets to the event for every seat in a venue.<br>
+            This will delete all tickets to the event, and create available tickets to the event for every seat in its venue.<br>
 			Event (ID): <br> <input type="text" name="eventID"><br>
-			Venue (ID): <br> <input type="text" name="eventID"><br>
 		        <input type="hidden" name="action" value="18">	
 			<input type="submit" value="Refresh">
+		</form>
+
+        <li class="section_break">
+			<h3>Update base price for an event</h3>
+			<p></p>
+		</li>
+        <form method="post" action="organizer.php">
+			Event (ID): <br> <input type="text" name="eventID"><br>
+			New Base Price: <br> <input type="text" name="basePrice"><br>
+		        <input type="hidden" name="action" value="19">	
+			<input type="submit" value="Update">
 		</form>
 		
 		<br><br><a href="login.html">logout</a>

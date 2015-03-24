@@ -24,7 +24,8 @@ include 'db.php';
 //cho $organizerID;
 //cho "\n";
 $organizerID = $_COOKIE['organizer_id'];
-echo sprintf("\nOrg: %s\n", $organizerID);
+echo sprintf("\nCurrent Organizer: %s\n", $organizerID);
+echo "<br>";
 
     function get_post_default($k, $default)
     {
@@ -89,7 +90,7 @@ echo sprintf("\nOrg: %s\n", $organizerID);
             $userType = $_POST['userType'];
             $venue = $_POST['venueID'];
             echo "Got new seating section w/ price {$price}, seats {$seats}. user type {$userType} and venue {$venue}.<br>";
-            $query = 'INSERT INTO SeatingSection_inVenue (sectionID, venueID, additionalPrice, seatsAvailable, seatingSectionType) VALUES (SEQ_SECTION.NEXTVAL, '.$venue.',' . $price.','. $seats.','. $userType.')';
+            $query = 'INSERT INTO SeatingSection_inVenue (sectionID, venueID, additionalPrice, seatsAvailable, sectionSectionType) VALUES (SEQ_SECTION.NEXTVAL, '.$venue.',' . $price.','. $seats.','. $userType.')';
             $result = get_html_table($query);
             echo $result;
         }
@@ -228,9 +229,59 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         if (isset($_POST['numVenues']))
         {
           echo "Num venues: {$_POST['numVenues']}.<br>";
-          $fmt = "SELECT V.venueID, count(*) as events FROM Venue V, Event_atVenue E WHERE V.venueID = E.venueID AND ROWNUM <= %s GROUP BY V.venueID ORDER BY count(*)";
+          $fmt = "SELECT V.venueID, count(*) as events 
+            FROM Venue V, Event_atVenue E 
+            WHERE V.venueID = E.venueID 
+              AND ROWNUM <= %s 
+            GROUP BY V.venueID 
+            ORDER BY count(*)";
           $q = sprintf($fmt, $_POST['numVenues']);
           echo get_html_table($q);
+
+          // Now doing that huge query
+          // Average events per venue, then the max or min of them
+          // Max Average Seats sold per venue
+          $mm = strtolower($_POST['minmax']);
+          if ($mm != 'min' and $mm != 'max') {
+            echo 'Need min or max only, got ' . $mm;
+            return;
+          }
+          echo 'dumb';
+          $fmt = "
+            WITH eventTicketsSold
+            AS
+            (SELECT eid, cnt
+              FROM
+                ((SELECT E.eventID eid, count(*) cnt
+                  FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
+                  WHERE E.eventID = FAT.eventID 
+                  AND FAT.ticketID = T.ticketID 
+                  GROUP BY E.eventID)
+                UNION
+                  (SELECT E2.eventID eid, 0 cnt
+                   FROM Event_atVenue E2
+                   WHERE E2.eventID NOT IN (SELECT E3.eventID FROM Event_atVenue E3, ForAdmissionTo FAT2, Ticket_ownsSeat_WithCustomer T2
+                                            WHERE E3.eventID = FAT2.eventID 
+                                              AND FAT2.ticketID = T2.ticketID)
+                   )
+                 )
+            ),
+            averageVenueSales
+            AS
+            (
+              SELECT V.venueID venueID, avg(ETS.cnt) average
+              FROM eventTicketsSold ETS, Event_atVenue E, Venue V
+              WHERE ETS.eid = E.eventID
+                AND E.venueID = V.venueID
+                GROUP BY V.venueID
+             )
+            SELECT AVS.venueID, AVS.average as Average_Tickets_Sold
+            FROM averageVenueSales AVS
+            WHERE AVS.average = (SELECT %s(average)
+                                 FROM averageVenueSales)";
+          $q = sprintf($fmt, $_POST['minmax']);
+          echo get_html_table($q);
+
         }
         else
         {
@@ -243,40 +294,48 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         if (isset($_POST['numEvents']))
         {
           echo "Num Events: {$_POST['numEvents']}.<br>";
-          $fmt = "SELECT E.eventID, count(*) 
-            FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
-            WHERE E.eventID = FAT.eventID 
-            AND FAT.ticketID = T.ticketID 
-            AND ROWNUM <= %s 
-            GROUP BY E.eventID 
-            ORDER BY count(*)";
+          $fmt = "
+            SELECT *
+            FROM
+              ((SELECT E.eventID eid, count(*) cnt
+                FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
+                WHERE E.eventID = FAT.eventID 
+                AND FAT.ticketID = T.ticketID 
+                GROUP BY E.eventID)
+              UNION
+                (SELECT E2.eventID eid, 0 cnt
+                 FROM Event_atVenue E2
+                 WHERE E2.eventID NOT IN (SELECT E3.eventID FROM Event_atVenue E3, ForAdmissionTo FAT2, Ticket_ownsSeat_WithCustomer T2
+                                          WHERE E3.eventID = FAT2.eventID 
+                                          AND FAT2.ticketID = T2.ticketID)
+                 )
+              ORDER BY cnt DESC)
+            WHERE ROWNUM <= %s";
           $q = sprintf($fmt, $_POST['numEvents']);
           echo get_html_table($q);
 
           echo '<br>my events<br>';
-          $fmt = "
-            WITH
-            myEvents AS
-            (SELECT E2.eventID eid
-              FROM Event_atVenue E2
-              WHERE E2.organizerID = %s),
-            myEventSales AS
-             (SELECT E.eventID eid, count(*) cnt
-              FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
-              WHERE E.eventID = FAT.eventID 
-                AND FAT.ticketID = T.ticketID 
-                AND E.eventID IN myEvents
-                GROUP BY E.eventID),
-            noSales AS
-            (SELECT eventID eid, 0 cnt
-             FROM myEvents ME
-             WHERE ME.eid NOT IN (SELECT eid FROM myEventSales))
-            SELECT eid, cnt
-            FROM (myEventSales UNION noSales)
-            WHERE ROWNUM <= %s
-            ORDER BY cnt";
           $organizerID = $_COOKIE['organizer_id'];
-          $q = sprintf($fmt, $organizerID, $organizerID, $_POST['numEvents']);
+          $fmt = "
+            SELECT *
+            FROM
+              ((SELECT E.eventID eid, count(*) cnt
+                FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
+                WHERE E.eventID = FAT.eventID 
+                AND FAT.ticketID = T.ticketID 
+                AND E.organizerID = %s
+                GROUP BY E.eventID)
+              UNION
+                (SELECT E2.eventID eid, 0 cnt
+                 FROM Event_atVenue E2
+                 WHERE E2.eventID NOT IN (SELECT E3.eventID FROM Event_atVenue E3, ForAdmissionTo FAT2, Ticket_ownsSeat_WithCustomer T2
+                                          WHERE E3.eventID = FAT2.eventID 
+                                          AND FAT2.ticketID = T2.ticketID 
+                                          AND E3.organizerID = %s)
+                 AND E2.organizerID = %s)
+              ORDER BY cnt DESC)
+            WHERE ROWNUM <= %s";
+          $q = sprintf($fmt, $organizerID, $organizerID, $organizerID, $_POST['numEvents']);
           echo run_query($q);
           echo get_html_table($q);
         }
@@ -289,21 +348,77 @@ echo sprintf("\nOrg: %s\n", $organizerID);
     function delete_account()
     {
       // Don't know if this will work
-      $fmt = "DELETE FROM Organizer WHERE username = %s";
-      $q = sprintf($fmt, $_SESSION['login_user']);
+      $fmt = "DELETE FROM Organizer WHERE organizerID = %s";
+      $q = sprintf($fmt, $_COOKIE['organizer_id']);
+      echo run_query($q);
     }
 
     function refreshTicketsToEvent()
     {
-        // first store current sequence ticket ID
-        $startTID = SEQ_TICKET;
-        echo $startTID;
+        if (isset($_POST['eventID']))
+        {
+            // First store current sequence ticket ID
+            $q = "SELECT SEQ_TICKET.NEXTVAL from Ticket_ownsSeat_WithCustomer";
+            $startTIDArr = oci_fetch_array(run_query($q));
+            //echo $startTIDArr;
+
+            foreach ($startTIDArr as $item) {
+                $startTID = ($item !== null ? htmlentities($item, ENT_QUOTES) : "&nbsp;");
+            }
+
+            // opted to NOT delete tickets first, and will assume user is smart and does not have any tickets already created
+            // when they use this function.
+    /*        // Second delete all tickets associated with this event
+            $fmt = "DELETE FROM Ticket_ownsSeat_WithCustomer T, ForAdmissionTo FAT 
+                    WHERE FAT.eventID = %s AND T.ticketID = FAT.ticketID";
+            $q = sprintf($fmt, $_POST['eventID']);
+            run_query($q); */ 
+            
+            // Third create new tickets for a venue
+            $q =   "INSERT INTO Ticket_ownsSeat_WithCustomer
+                    SELECT SEQ_TICKET.NEXTVAL, NULL, 't', SIS.sectionID, SIS.venueID, SIS.seat_row, SIS.seatNo
+                    FROM SeatingSection_inVenue SSIV, Seat_inSection SIS, Venue V                
+                    WHERE V.venueID = SSIV.venueID AND SSIV.venueID = SIS.venueID AND SSIV.sectionID = SIS.sectionID";
+            run_query($q);
+
+            // Finally, repopulate ForAdmissionTo
+
+            $fmt = "INSERT INTO ForAdmissionTo
+                    SELECT %s, ticketID 
+                    FROM Ticket_ownsSeat_WithCustomer
+                    WHERE ticketID >= $startTID";
+            $q = sprintf($fmt, $_POST['eventID']);
+            run_query($q);
+
+            echo "Refreshed tickets successfully for eventID: {_POST['eventID']}"; 
+            echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
+        }
+        else
+        {
+            echo "Invalid parameters.<br>";
+        }
+    }
+
+    function changeBasePrice()
+    {
+        if (isset($_POST['eventID']) && isset($_POST['basePrice']))
+        {
+          echo "Event ID: {$_POST['eventID']}. New base price: {$_POST['basePrice']}<br>";
+          $fmt = "UPDATE Event_atVenue SET basePrice = %s WHERE eventID = %s";
+          $q = sprintf($fmt, $_POST['basePrice'], $_POST['eventID']);
+          get_html_table($q);
+          echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
+        }
+        else
+        {
+            echo "Invalid parameters.<br>";
+        }
     }
 
     $action_num = intval(get_post_default('action', '0'));
-    if ($action_num >= 1 && $action_num <= 17)
+    if ($action_num >= 1 && $action_num <= 19)
     {
-        echo "Action num: {$action_num}.<br>";
+        //echo "Action num: {$action_num}.<br>";
         switch ($action_num)
         {
             case 1:
@@ -360,9 +475,12 @@ echo sprintf("\nOrg: %s\n", $organizerID);
             case 18:
                 refreshTicketsToEvent();
                 break;
+            case 19:
+                changeBasePrice();
+                break;
             default:
                 echo "Invalid operation.<br>";
-                echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+                echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
                 break;
         }
     }
