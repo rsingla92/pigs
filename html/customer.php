@@ -182,17 +182,33 @@
     {
         if (isset($_POST['numEvents']))
         {
-            echo "List of {$_POST['numEvents']} most popular event(s):<br>";
-	    if(!is_numeric($_POST['numEvents']))
-	    {
-	   	echo "Please check the types of your entries. An error may occur!<br>";
-	    	return;
-	    } 
+          echo "Num Events: {$_POST['numEvents']}.<br>";
 
+            if(!is_numeric($_POST['numEvents']))
+            {
+               echo "Please check the types of your entries! An error may occur!<br>";
+               return;		
+            }
 
-	    $numEvents = $_POST['numEvents'];
- 	    $query = 'SELECT EV.eventName, COUNT(*) FROM Event_atVenue EV, forAdmissionTo F, ticket_OwnsSeat_WithCustomer T WHERE F.eventID = EV.eventID AND T.isAvailable = 0 AND ROWNUM <= '. $numEvents .' GROUP BY EV.eventName';
-	    echo get_html_table($query);
+          $fmt = "
+            SELECT *
+            FROM
+              ((SELECT E.eventID eid, count(*) cnt
+                FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
+                WHERE E.eventID = FAT.eventID 
+                AND FAT.ticketID = T.ticketID 
+                GROUP BY E.eventID)
+              UNION
+                (SELECT E2.eventID eid, 0 cnt
+                 FROM Event_atVenue E2
+                 WHERE E2.eventID NOT IN (SELECT E3.eventID FROM Event_atVenue E3, ForAdmissionTo FAT2, Ticket_ownsSeat_WithCustomer T2
+                                          WHERE E3.eventID = FAT2.eventID 
+                                          AND FAT2.ticketID = T2.ticketID)
+                 )
+              ORDER BY cnt DESC)
+            WHERE ROWNUM <= %s";
+          $q = sprintf($fmt, $_POST['numEvents']);
+          echo get_html_table($q);
         }
         else
         {
