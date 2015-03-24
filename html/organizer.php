@@ -357,26 +357,22 @@ echo sprintf("\nOrg: %s\n", $organizerID);
       echo "Fans";
       $fmt = "
         WITH
-        bandConcerts
-        AS
-        (SELECT eventID eventID
-          FROM Event_atVenue
-          WHERE eventName = '%s'),
         customerEvents
         AS
         (SELECT C.userID, E.eventID
         FROM Customer C, Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T
         WHERE E.eventID = FAT.eventID
           AND FAT.ticketID = T.ticketID
-          AND T.userID = C.userID)
+          AND T.userID = C.userID
+        )
         SELECT CE.userID
         FROM customerEvents CE
         WHERE CE.eventID IN (SELECT eventID eventID
                              FROM Event_atVenue
                              WHERE eventName = '%s')
         GROUP BY CE.userID
-        HAVING count(*) = (SELECT count(eventID)
-                           FROM bandConcerts)
+        HAVING count(*) = (SELECT count(*)
+                           FROM Event_atVenue WHERE eventName = '%s')
         ";
       $q = sprintf($fmt, $_POST['eventName'], $_POST['eventName']);
       echo get_html_table($q);
