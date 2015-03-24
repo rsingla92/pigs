@@ -83,9 +83,9 @@
     function view_purchased_tickets()
     {
         // TODO: Query to find purchased tickets
-        echo "Purchased tickets for customer with username {$_SESSION['login_user']}:<br>";
-        $username = $_SESSION['login_user'];
-	$query = 'SELECT seat_row, seatNo FROM ticket_ownsSeat_WithCustomers T, customer C WHERE T.userID = C.userID AND C.username = '. $username ;
+        echo "Purchased tickets for customer with username {$_COOKIE['login_user']}:<br>";
+        $username = $_COOKIE['login_user'];
+	$query = "SELECT seat_row, seatNo FROM ticket_ownsSeat_WithCustomer T, customer C WHERE T.userID = C.userID AND C.username = '{$username}'";
 	echo get_html_table($query);
         echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
@@ -158,12 +158,12 @@
 
     function delete_account()
     {
-        echo "Deleted user {$_SESSION['login_user']}.<br>";
-	$username = $_SESSION['login_user'];
+        echo "Deleted user {$_COOKIE['login_user']}.<br>";
+	$username = $_COOKIE['login_user'];
         $query = 'DELETE FROM Organizer WHERE username = ' . $username;
         $result = get_html_table($query); 
  	
-	unset($_SESSION['login_user']);
+	unset($_COOKIE['login_user']);
         session_destroy();
     }
 
