@@ -432,7 +432,7 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         WITH
         customerEvents
         AS
-        (SELECT C.userID, E.eventID
+        (SELECT DISTINCT C.userID, E.eventID
         FROM Customer C, Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T
         WHERE E.eventID = FAT.eventID
           AND FAT.ticketID = T.ticketID
@@ -445,7 +445,8 @@ echo sprintf("\nOrg: %s\n", $organizerID);
                              WHERE eventName = '%s')
         GROUP BY CE.userID
         HAVING count(*) = (SELECT count(*)
-                           FROM Event_atVenue WHERE eventName = '%s')
+                           FROM Event_atVenue 
+                           WHERE eventName = '%s')
         ";
       $q = sprintf($fmt, $_POST['eventName'], $_POST['eventName']);
       echo get_html_table($q);
