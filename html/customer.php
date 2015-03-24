@@ -38,8 +38,7 @@
                   FROM Event_atVenue E, venue V 
                   WHERE E.venueID = V.venueID AND 
                   (V.cityName LIKE '{$eventCity}' 
-                   OR E.eventName LIKE '{$eventName}'
-                   OR (EXTRACT (YEAR FROM E.startTime ) = {$eventYear} AND EXTRACT (MONTH FROM E.startTime) = {$eventMonth}))";
+                   OR E.eventName LIKE '{$eventName}')";
 
 	echo "Results for events:<br>";
 	echo get_html_table($query);
