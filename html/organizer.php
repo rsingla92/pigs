@@ -220,7 +220,7 @@ echo sprintf("\nOrg: %s\n", $organizerID);
  
     function view_purchased_seats()
     {
-      echo get_html_table("SELECT * FROM Ticket_ownsSeat_WithCustomer");
+      echo get_html_table("SELECT * FROM Ticket_ownsSeat_WithCustomer NATURAL JOIN ForAdmissionTo");
     }
 
     function view_most_popular_venues()
@@ -352,8 +352,38 @@ echo sprintf("\nOrg: %s\n", $organizerID);
       echo run_query($q);
     }
 
+    function find_superfans()
+    {
+      echo "Fans";
+      $fmt = "
+        WITH
+        bandConcerts
+        AS
+        (SELECT eventID eventID
+          FROM Event_atVenue
+          WHERE eventName = '%s'),
+        customerEvents
+        AS
+        (SELECT C.userID, E.eventID
+        FROM Customer C, Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T
+        WHERE E.eventID = FAT.eventID
+          AND FAT.ticketID = T.ticketID
+          AND T.userID = C.userID)
+        SELECT CE.userID
+        FROM customerEvents CE
+        WHERE CE.eventID IN (SELECT eventID eventID
+                             FROM Event_atVenue
+                             WHERE eventName = '%s')
+        GROUP BY CE.userID
+        HAVING count(*) = (SELECT count(eventID)
+                           FROM bandConcerts)
+        ";
+      $q = sprintf($fmt, $_POST['eventName'], $_POST['eventName']);
+      echo get_html_table($q);
+    }
+
     $action_num = intval(get_post_default('action', '0'));
-    if ($action_num >= 1 && $action_num <= 17)
+    if ($action_num >= 1 && $action_num <= 18)
     {
         echo "Action num: {$action_num}.<br>";
         switch ($action_num)
@@ -408,6 +438,9 @@ echo sprintf("\nOrg: %s\n", $organizerID);
                 break;
             case 17:
                 delete_account();
+                break;
+            case 18:
+                find_superfans();
                 break;
             default:
                 echo "Invalid operation.<br>";
