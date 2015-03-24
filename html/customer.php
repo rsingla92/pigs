@@ -161,7 +161,12 @@
 	    } 
 
 	    $numVenues = $_POST['numVenues'];
-	    $query = 'SELECT V.name, VC.cnt FROM venue V, (SELECT V.venueID, COUNT(*) cnt FROM ticket_OwnsSeat_WithCustomer T, venue V GROUP BY V.venueID) VC WHERE ROWNUM <= '. $numVenues .' ORDER BY VC.cnt';   
+	    $query = "SELECT V1.name, VC.cnt 
+                      FROM venue V1, (SELECT T.venueID, COUNT(*) cnt 
+                                      FROM ticket_OwnsSeat_WithCustomer T
+                                      GROUP BY T.venueID) VC 
+                      WHERE V1.venueID = VC.venueID AND ROWNUM <= {$numVenues}
+                      ORDER BY VC.cnt DESC";   
 	
             echo get_html_table($query);
         }
