@@ -308,35 +308,45 @@ echo sprintf("\nOrg: %s\n", $organizerID);
           // Now doing that huge query
           // Average events per venue, then the max or min of them
           // Max Average Seats sold per venue
+          $mm = strtolower($_POST['minmax']);
+          if ($mm != 'min' and $mm != 'max') {
+            echo 'Need min or max only, got ' . $mm;
+            return;
+          }
           echo 'dumb';
           $fmt = "
-            SELECT *
-            FROM (
-                WITH eventTicketsSold
-                AS
-                (SELECT eid, cnt
-                FROM
-                  ((SELECT E.eventID eid, count(*) cnt
-                    FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
-                    WHERE E.eventID = FAT.eventID 
-                    AND FAT.ticketID = T.ticketID 
-                    GROUP BY E.eventID)
-                  UNION
-                    (SELECT E2.eventID eid, 0 cnt
-                     FROM Event_atVenue E2
-                     WHERE E2.eventID NOT IN (SELECT E3.eventID FROM Event_atVenue E3, ForAdmissionTo FAT2, Ticket_ownsSeat_WithCustomer T2
-                                              WHERE E3.eventID = FAT2.eventID 
-                                                AND FAT2.ticketID = T2.ticketID)
-                     )
+            WITH eventTicketsSold
+            AS
+            (SELECT eid, cnt
+              FROM
+                ((SELECT E.eventID eid, count(*) cnt
+                  FROM Event_atVenue E, ForAdmissionTo FAT, Ticket_ownsSeat_WithCustomer T 
+                  WHERE E.eventID = FAT.eventID 
+                  AND FAT.ticketID = T.ticketID 
+                  GROUP BY E.eventID)
+                UNION
+                  (SELECT E2.eventID eid, 0 cnt
+                   FROM Event_atVenue E2
+                   WHERE E2.eventID NOT IN (SELECT E3.eventID FROM Event_atVenue E3, ForAdmissionTo FAT2, Ticket_ownsSeat_WithCustomer T2
+                                            WHERE E3.eventID = FAT2.eventID 
+                                              AND FAT2.ticketID = T2.ticketID)
                    )
-                )
-                SELECT V.venueID, avg(ETS.cnt) average, max(avg(ETS.cnt)) over (partition by V.venueID) as pcnt
-                FROM eventTicketsSold ETS, Event_atVenue E, Venue V
-                WHERE ETS.eid = E.eventID
-                  AND E.venueID = V.venueID
-                  GROUP BY V.venueID)
-            WHERE average = pcnt";
-          $q = sprintf($fmt, $_POST['numVenues']);
+                 )
+            ),
+            averageVenueSales
+            AS
+            (
+              SELECT V.venueID venueID, avg(ETS.cnt) average
+              FROM eventTicketsSold ETS, Event_atVenue E, Venue V
+              WHERE ETS.eid = E.eventID
+                AND E.venueID = V.venueID
+                GROUP BY V.venueID
+             )
+            SELECT AVS.venueID, AVS.average as Average_Tickets_Sold
+            FROM averageVenueSales AVS
+            WHERE AVS.average = (SELECT %s(average)
+                                 FROM averageVenueSales)";
+          $q = sprintf($fmt, $_POST['minmax']);
           echo get_html_table($q);
 
         }
