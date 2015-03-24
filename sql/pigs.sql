@@ -23,7 +23,7 @@ drop SEQUENCE SEQ_TICKET;
 drop SEQUENCE SEQ_ORGANIZER;
 
 -- Create tables with their constraints
-CREATE TABLE Venue (venueID INT , name VARCHAR(255), address VARCHAR(255), cityName VARCHAR(255), provName VARCHAR(255), oranizerID INT, PRIMARY KEY (venueID), UNIQUE (address, cityName, provName));
+CREATE TABLE Venue (venueID INT , name VARCHAR(255), address VARCHAR(255), cityName VARCHAR(255), provName VARCHAR(255), organizerID INT, PRIMARY KEY (venueID), UNIQUE (address, cityName, provName));
 CREATE SEQUENCE SEQ_VENUE START WITH 10 INCREMENT BY 1;
 
 CREATE TABLE Event_atVenue (venueID INT, eventID INT, eventName VARCHAR(255), basePrice INT, saleOpenDate TIMESTAMP, ticketStatus VARCHAR(255), startTime TIMESTAMP, endTime TIMESTAMP, organizerID INT, PRIMARY KEY(eventID), UNIQUE (startTime, endTime, venueID), CONSTRAINT eavC CHECK (basePrice >= 0));
@@ -76,16 +76,16 @@ INSERT INTO customer (userID, firstName, lastName, email, username, password) VA
 (5, 'Jarett', 'Mitchell', 'jarett@gmail.com', 'jarett', 'muchfun');
 
 
-INSERT INTO event_atvenue (venueID, eventID, eventName, basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
-(1, 1, 'Alexisonfire', 30, '2014-04-14 00:00:01', 'Open', '2014-05-14 19:00:00', '2014-05-14 23:59:00');
-INSERT INTO event_atvenue (venueID, eventID,  eventName, basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
-(2, 2, 'Pink Floyd', 80, '2014-04-10 00:00:01', 'Closed', '2014-04-24 19:00:00', '2014-04-25 19:00:00');
-INSERT INTO event_atvenue (venueID, eventID,  eventName, basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
-(3, 3, 'CPSC 304: Back to the Database', 5, '2015-05-01 08:00:00', 'Closed', '2015-06-06 09:00:00', '2015-06-06 11:00:00');
-INSERT INTO event_atvenue (venueID, eventID,  eventName, basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
-(4, 4, 'Comic Con 39', 150, '2015-04-01 00:00:00', 'Closed', '2015-07-20 09:00:00', '2015-07-27 23:00:00');
-INSERT INTO event_atvenue (venueID, eventID, eventName,  basePrice, saleOpenDate, ticketStatus, startTime, endTime) VALUES -
-(5, 5, '53rd Annual Gala', 25, '2015-02-01 00:00:01', 'Closed', '2015-04-13 18:30:00', '2015-04-15 21:00:00');
+INSERT INTO event_atvenue (venueID, eventID, eventName, basePrice, saleOpenDate, ticketStatus, startTime, endTime, organizerID) VALUES -
+(1, 1, 'Alexisonfire', 30, '2014-04-14 00:00:01', 'Open', '2014-05-14 19:00:00', '2014-05-14 23:59:00', 1);
+INSERT INTO event_atvenue (venueID, eventID,  eventName, basePrice, saleOpenDate, ticketStatus, startTime, endTime, organizerID) VALUES -
+(2, 2, 'Pink Floyd', 80, '2014-04-10 00:00:01', 'Closed', '2014-04-24 19:00:00', '2014-04-25 19:00:00', 2);
+INSERT INTO event_atvenue (venueID, eventID,  eventName, basePrice, saleOpenDate, ticketStatus, startTime, endTime, organizerID) VALUES -
+(3, 3, 'CPSC 304: Back to the Database', 5, '2015-05-01 08:00:00', 'Closed', '2015-06-06 09:00:00', '2015-06-06 11:00:00', 3);
+INSERT INTO event_atvenue (venueID, eventID,  eventName, basePrice, saleOpenDate, ticketStatus, startTime, endTime, organizerID) VALUES -
+(4, 4, 'Comic Con 39', 150, '2015-04-01 00:00:00', 'Closed', '2015-07-20 09:00:00', '2015-07-27 23:00:00', 4);
+INSERT INTO event_atvenue (venueID, eventID, eventName,  basePrice, saleOpenDate, ticketStatus, startTime, endTime, organizerID) VALUES -
+(5, 5, '53rd Annual Gala', 25, '2015-02-01 00:00:01', 'Closed', '2015-04-13 18:30:00', '2015-04-15 21:00:00', 5);
 
 
 INSERT INTO foradmissionto (eventID, ticketID) VALUES -

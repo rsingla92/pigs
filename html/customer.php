@@ -36,7 +36,12 @@
 	    return;
 	}
 	
-	$query = 'SELECT * FROM Event_atVenue E, venue V WHERE E.venueID = V.venueID AND V.cityName LIKE \'%'."$eventCity" .'%\' OR E.eventName LIKE \'%'.$eventName .'%\'';
+        $query = "SELECT E.eventID, E.venueID, E.eventName, E.basePrice, V.name, V.cityName, E.startTime 
+                  FROM Event_atVenue E, venue V 
+                  WHERE E.venueID = V.venueID AND 
+                  (V.cityName LIKE '{$eventCity}' 
+                   OR E.eventName LIKE '{$eventName}'
+                   OR (EXTRACT (YEAR FROM E.startTime ) = {$eventYear} AND EXTRACT (MONTH FROM E.startTime) = {$eventMonth}))";
 
 	echo "Results for events named {$eventName} on the month of {$eventMonth}, {$eventYear} in the city of {$eventCity}:<br>";
 	echo get_html_table($query);
