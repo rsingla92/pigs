@@ -197,13 +197,12 @@ echo sprintf("\nOrg: %s\n", $organizerID);
       if (isset($_POST['venueID'], $_POST['sectionID']))
         {
           echo "Section ID: {$_POST['sectionID']}.<br>";
-	  if( !is_numeric($_POST['venueID'] || !is_numeric($_POST['sectionID')) )
-	  {
-	  	echo "Please check the types of your entries! An error may occur!<br>";
-		return;		
-	  }
-          
-	  
+          if( !is_numeric($_POST['venueID']) || !is_numeric($_POST['sectionID']) )
+          {
+            echo "Please check the types of your entries! An error may occur!<br>";
+            return;		
+          }
+
           $fmt = "DELETE FROM SeatingSection_inVenue WHERE sectionID = %s AND venueID = %s";
           $q = sprintf($fmt, $_POST['sectionID'], $_POST['venueID']);
           echo get_html_table($q);
@@ -220,7 +219,7 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         if (isset($_POST['row']) && isset($_POST['seatNo']))
         {
           echo "Row: {$_POST['row']}, Seat No: {$_POST['seatNo']}.<br>";
-	  if( !is_numeric($_POST['row'] || !is_numeric($_POST['seatNo')) )
+	  if( !is_numeric($_POST['row']) || !is_numeric($_POST['seatNo']) )
 	  {
 	  	echo "Please check the types of your entries! An error may occur!<br>";
 		return;		
@@ -290,7 +289,7 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         {
           echo "Num venues: {$_POST['numVenues']}.<br>";
 
-   	  if(!is_numeric($_POST['numVenues'])
+   	  if(!is_numeric($_POST['numVenues']))
 	  {
 	     echo "Please check the types of your entries! An error may occur!<br>";
 	     return;		
@@ -361,12 +360,14 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         if (isset($_POST['numEvents']))
         {
           echo "Num Events: {$_POST['numEvents']}.<br>";
+        
+    
 
-	  if(!is_numeric($_POST['numEvents'])
-	  {
-	     echo "Please check the types of your entries! An error may occur!<br>";
-	     return;		
-	  }
+        if(!is_numeric($_POST['numEvents']))
+        {
+           echo "Please check the types of your entries! An error may occur!<br>";
+           return;		
+        }
           $fmt = "
             SELECT *
             FROM
