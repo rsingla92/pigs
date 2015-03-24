@@ -312,7 +312,7 @@ echo sprintf("\nOrg: %s\n", $organizerID);
             echo 'Need min or max only, got ' . $mm;
             return;
           }
-          echo 'dumb';
+          echo 'For each venue, there is an average number of seats sold for events at that venue. Select the max or min of these averages.';
           $fmt = "
             WITH eventTicketsSold
             AS
@@ -360,8 +360,6 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         if (isset($_POST['numEvents']))
         {
           echo "Num Events: {$_POST['numEvents']}.<br>";
-        
-    
 
         if(!is_numeric($_POST['numEvents']))
         {
