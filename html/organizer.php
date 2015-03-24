@@ -47,8 +47,19 @@ echo sprintf("\nOrg: %s\n", $organizerID);
                       'startTime',
                       'endTime',
                       'saleOpenTime');
+
         if (all_set($vals))
         {
+	  // do not check the name of the venue.
+	  if(!is_numeric($_POST['venueID']) || !is_numeric($_POST['basePrice'])
+		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}',$_POST['startTime'])
+		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}',$_POST['endTime']) 
+		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}',$_POST['saleOpenTime']))
+	  {
+		echo "Please check the types of your entries! An error may occur!<br>";
+		return;
+	  }
+
           echo "Got venue with ID {$_POST['venueID']}, name {$_POST['name']}, and price {$_POST['basePrice']}.<br>";
           $fmt = "INSERT INTO Event_atVenue VALUES (%s, SEQ_EVENT.NEXTVAL, '%s', %s, TO_TIMESTAMP('%s'), '%s', TO_TIMESTAMP('%s'), TO_TIMESTAMP('%s'), %s)";
           $q = sprintf($fmt, $_POST['venueID'], $_POST['name'], $_POST['basePrice'],
@@ -67,6 +78,13 @@ echo sprintf("\nOrg: %s\n", $organizerID);
        
        if (all_set($vals))
        {
+		// do not check the name of the venue or address
+	   if(!ctype_alnum($_POST['city'] || !ctype_alnum($_POST['province'])))
+	   {
+		echo "Please check the types of your entries! An error may occur!<br>";
+		return;
+	   }
+
            echo "Got venue with name {$_POST['name']}, address {$_POST['address']}, city {$_POST['city']}, province {$_POST['province']}.<br>";
            $q = "INSERT INTO Venue VALUES (SEQ_VENUE.NEXTVAL, '%s', '%s', '%s', '%s')";
            $qe = sprintf($q, $_POST['name'], $_POST['address'], $_POST['city'], $_POST['province']);
@@ -88,6 +106,13 @@ echo sprintf("\nOrg: %s\n", $organizerID);
             $seats = $_POST['seatsAvailable'];
             $userType = $_POST['userType'];
             $venue = $_POST['venueID'];
+	
+	    if(!is_numeric($price) || !$is_numeric($seatsAvailable) || !ctype_alnum($userType) || !is_numeric($venue))
+	    {
+		echo "Please check the types of your entries! An error may occur!<br>";
+		return;
+            }
+
             echo "Got new seating section w/ price {$price}, seats {$seats}. user type {$userType} and venue {$venue}.<br>";
             $query = 'INSERT INTO SeatingSection_inVenue (sectionID, venueID, additionalPrice, seatsAvailable, sectionSectionType) VALUES (SEQ_SECTION.NEXTVAL, '.$venue.',' . $price.','. $seats.','. $userType.')';
             $result = get_html_table($query);
@@ -109,6 +134,12 @@ echo sprintf("\nOrg: %s\n", $organizerID);
             $seat = $_POST['seatNo'];
             $section = $_POST['sectionID'];
             $venue = $_POST['venueID'];
+
+	    if( !is_numeric($row) || !is_numeric($seat) || !is_numeric($section) || !is_numeric($venue))
+	    {
+	    	echo "Please check the types of your entries! An error may occur!<br>";
+		return;		
+            } 
             echo "Row {$row}, seat {$seat}, section {$section}, venue {$venue}.<br>";
             $fmt = "INSERT INTO Seat_inSection VALUES (%s, %s, %s, %s)";
             $q = sprintf($fmt, $section, $venue, $row, $seat);
@@ -125,6 +156,12 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         if (isset($_POST['eventID']))
         {
           echo "Event ID: {$_POST['eventID']}.<br>";
+
+	  if( !is_numeric($eventID) )
+	  {
+	  	echo "Please check the types of your entries! An error may occur!<br>";
+		return;		
+	  }
           $fmt = "DELETE FROM Event_atVenue WHERE eventID = %s";
           $q = sprintf($fmt, $_POST['eventID']);
           echo get_html_table($q);
@@ -140,6 +177,11 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         if (isset($_POST['venueID']))
         {
           echo "Venue ID: {$_POST['venueID']}.<br>";
+          if( !is_numeric($venueID) )
+	  {
+	  	echo "Please check the types of your entries! An error may occur!<br>";
+		return;		
+	  }
           $fmt = "DELETE FROM Venue WHERE venueID = %s";
           $q = sprintf($fmt, $_POST['venueID']);
           echo get_html_table($q);
@@ -155,6 +197,13 @@ echo sprintf("\nOrg: %s\n", $organizerID);
       if (isset($_POST['venueID'], $_POST['sectionID']))
         {
           echo "Section ID: {$_POST['sectionID']}.<br>";
+	  if( !is_numeric($_POST['venueID'] || !is_numeric($_POST['sectionID')) )
+	  {
+	  	echo "Please check the types of your entries! An error may occur!<br>";
+		return;		
+	  }
+          
+	  
           $fmt = "DELETE FROM SeatingSection_inVenue WHERE sectionID = %s AND venueID = %s";
           $q = sprintf($fmt, $_POST['sectionID'], $_POST['venueID']);
           echo get_html_table($q);
@@ -171,6 +220,12 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         if (isset($_POST['row']) && isset($_POST['seatNo']))
         {
           echo "Row: {$_POST['row']}, Seat No: {$_POST['seatNo']}.<br>";
+	  if( !is_numeric($_POST['row'] || !is_numeric($_POST['seatNo')) )
+	  {
+	  	echo "Please check the types of your entries! An error may occur!<br>";
+		return;		
+	  }
+          
           $fmt = "DELETE FROM Seat_inSection WHERE sectionID = %s AND venueID = %s AND seat_row = %s AND seatNo = %s";
           $q = sprintf($fmt, $_POST['sectionID'], $_POST['venueID'], $_POST['row'], $_POST['seatNo']);
           echo get_html_table($q);
@@ -187,6 +242,12 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         if (isset($_POST['eventID']))
         {
           echo "Event ID: {$_POST['eventID']}.<br>";
+
+	  if(!is_numeric($_POST['eventID']))
+	  {
+	   	echo "Please check the types of your entries! An error may occur!<br>";
+		return;		
+	  }
           $fmt = "UPDATE Event_atVenue SET saleOpenDate = CURRENT_TIMESTAMP WHERE eventID = %s";
           $q = sprintf($fmt, $_POST['eventID']);
           echo get_html_table($q);
@@ -228,6 +289,13 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         if (isset($_POST['numVenues']))
         {
           echo "Num venues: {$_POST['numVenues']}.<br>";
+
+   	  if(!is_numeric($_POST['numVenues'])
+	  {
+	     echo "Please check the types of your entries! An error may occur!<br>";
+	     return;		
+	  }
+
           $fmt = "SELECT V.venueID, count(*) as events 
             FROM Venue V, Event_atVenue E 
             WHERE V.venueID = E.venueID 
@@ -293,6 +361,12 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         if (isset($_POST['numEvents']))
         {
           echo "Num Events: {$_POST['numEvents']}.<br>";
+
+	  if(!is_numeric($_POST['numEvents'])
+	  {
+	     echo "Please check the types of your entries! An error may occur!<br>";
+	     return;		
+	  }
           $fmt = "
             SELECT *
             FROM

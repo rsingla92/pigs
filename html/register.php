@@ -26,9 +26,10 @@
         echo "Invalid email supplied.<br>";
         echo "Click <a href=\"register.html\">here<//a> to try again.";
     }
-    else if ($user === '' || $first_name === '' || $last_name === '' || ($user_type <> 1 && $user_type <> 2))
+    else if ($user === '' || $first_name === '' || $last_name === '' || ($user_type <> 1 && $user_type <> 2) ||
+		!ctype_alnum($first_name) || !ctype_alnum($last_name) || !ctype_alnum($user_type))
     {
-        echo "Invalid input to the registration form.<br>";
+	echo "Invalid input to the registration form.<br>";
         echo "Click <a href=\"register.html\">here<//a> to try again.";
     }
     else

@@ -28,6 +28,13 @@
         $eventName = get_post_default('eventName', ' ');
         $eventYear = get_post_default('eventYear', ' ');
         $eventMonth = get_post_default('eventMonth', '');
+
+	// do not check event name	
+	if(!ctype_alnum($eventCity) || !is_numeric($eventYear) || !is_numeric($eventMonth))
+	{
+	    echo "Please check the types of your entries. An error may occur!<br>";
+	    return;
+	}
 	
         $query = "SELECT E.eventID, E.venueID, E.eventName, E.basePrice, V.name, V.cityName, E.startTime 
                   FROM Event_atVenue E, venue V 
@@ -48,6 +55,13 @@
             $eventID = $_POST['eventID'];
           
             echo "Open sections for event with ID {$eventID}:<br>";
+
+	    if(!is_numeric($eventID))
+	    {
+	   	echo "Please check the types of your entries. An error may occur!<br>";
+	    	return;
+	
+	    }
 	    $query = 'SELECT distinct seatingSectionType, E.venueID FROM event_AtVenue E, seatingSection_inVenue S WHERE E.eventID = '. $eventID .' AND E.venueID = S.venueID AND S.seatsAvailable > 0';
 	     echo get_html_table($query);
 	 }
@@ -64,7 +78,13 @@
         if (isset($_POST['eventID']))
         {
             $eventID = $_POST['eventID'];
-           
+ 
+	    if(!is_numeric($eventID))
+	    {
+	   	echo "Please check the types of your entries. An error may occur!<br>";
+	    	return;
+	
+	    }          
             echo "Open seats for event with ID {$eventID}:<br>";
             $query = "SELECT S.seat_row, S.seatNo FROM seat_inSection S, Event_atVenue E WHERE S.venueID = E.venueID AND E.eventID = {$eventID}";
 	    $query .= " MINUS ";
@@ -101,6 +121,13 @@
             $seatNo = $_POST['seatNo'];
             $userID = $_COOKIE['user_id'];
 
+	    if(!is_numeric($eventID) || !$is_numeric($seatSectionID) || !is_numeric($row) || !is_numeric($seatNo))
+	    {
+	   	echo "Please check the types of your entries. An error may occur!<br>";
+	    	return;
+	    } 
+
+
             // TODO: Write query to purchase tickets.
             $query = 'INSERT INTO ticket_ownsSeat_WithCustomer (ticketID, userID, isAvailable, sectionID, venueID, seat_row, seatNo) ';
             $query .= 'SELECT SEQ_TICKET.NEXTVAL, ' . $userID . ', \'F\', ' . $seatSectionID . ', E.venueID, ' . $row . ', ' . $seatNo . ' ';
@@ -126,6 +153,13 @@
         if (isset($_POST['numVenues']))
         {
             echo "List of {$_POST['numVenues']} most popular venue(s):<br>";
+	
+	    if(!is_numeric($_POST['numVenues']))
+	    {
+	   	echo "Please check the types of your entries. An error may occur!<br>";
+	    	return;
+	    } 
+
 	    $numVenues = $_POST['numVenues'];
 	    $query = 'SELECT V.name, VC.cnt FROM venue V, (SELECT V.venueID, COUNT(*) cnt FROM ticket_OwnsSeat_WithCustomer T, venue V GROUP BY V.venueID) VC WHERE ROWNUM <= '. $numVenues .' ORDER BY VC.cnt';   
 	
@@ -144,6 +178,13 @@
         if (isset($_POST['numEvents']))
         {
             echo "List of {$_POST['numEvents']} most popular event(s):<br>";
+	    if(!is_numeric($_POST['numEvents']))
+	    {
+	   	echo "Please check the types of your entries. An error may occur!<br>";
+	    	return;
+	    } 
+
+
 	    $numEvents = $_POST['numEvents'];
  	    $query = 'SELECT EV.eventName, COUNT(*) FROM Event_atVenue EV, forAdmissionTo F, ticket_OwnsSeat_WithCustomer T WHERE F.eventID = EV.eventID AND T.isAvailable = 0 AND ROWNUM <= '. $numEvents .' GROUP BY EV.eventName';
 	    echo get_html_table($query);
