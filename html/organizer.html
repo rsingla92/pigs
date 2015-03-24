@@ -218,6 +218,18 @@
 		        <input type="hidden" name="action" value="17">	
 			Submit to delete. Are you sure?? <input type="submit" value="Submit">
 		</form>
+
+        <li class="section_break">
+			<h3>Refresh Tickets for Event at given Venue</h3>
+			<p></p>
+		</li>
+		<form method="post" action="organizer.php">
+            This will delete all tickets to the event, and create available tickets to the event for every seat in a venue.<br>
+			Event (ID): <br> <input type="text" name="eventID"><br>
+			Venue (ID): <br> <input type="text" name="eventID"><br>
+		        <input type="hidden" name="action" value="18">	
+			<input type="submit" value="Refresh">
+		</form>
 		
 		<br><br><a href="login.html">logout</a>
 		

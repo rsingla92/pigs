@@ -25,13 +25,11 @@
     {
         $eventCity = get_post_default('eventCity', ' '); 
         $eventName = get_post_default('eventName', ' ');
-        $eventYear = get_post_default('eventYear', ' ');
-        $eventMonth = get_post_default('eventMonth', '');
 	
 	$query = 'SELECT * FROM Event_atVenue E, venue V WHERE E.venueID = V.venueID AND V.cityName LIKE \'%'."$eventCity" .'%\' OR E.eventName LIKE \'%'.$eventName .'%\'';
         
 
-	echo "Results for events named {$eventName} on the month of {$eventMonth}, {$eventYear} in the city of {$eventCity}:<br>";
+	echo "Results for events:<br>";
 	echo run_query($query);
 	echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }

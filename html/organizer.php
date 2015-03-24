@@ -293,6 +293,13 @@ echo sprintf("\nOrg: %s\n", $organizerID);
       $q = sprintf($fmt, $_SESSION['login_user']);
     }
 
+    function refreshTicketsToEvent()
+    {
+        // first store current sequence ticket ID
+        $startTID = SEQ_TICKET;
+        echo $startTID;
+    }
+
     $action_num = intval(get_post_default('action', '0'));
     if ($action_num >= 1 && $action_num <= 17)
     {
@@ -349,6 +356,9 @@ echo sprintf("\nOrg: %s\n", $organizerID);
                 break;
             case 17:
                 delete_account();
+                break;
+            case 18:
+                refreshTicketsToEvent();
                 break;
             default:
                 echo "Invalid operation.<br>";
