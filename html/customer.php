@@ -30,7 +30,7 @@
         $eventMonth = get_post_default('eventMonth', '');
 
 	// do not check event name	
-	if(!ctype_alnum($eventCity) || !is_numeric($eventYear) || !is_numeric($eventMonth))
+	if(!ctype_alnum($eventCity) && !is_numeric($eventYear) && !is_numeric($eventMonth))
 	{
 	    echo "Please check the types of your entries. An error may occur!<br>";
 	    return;
@@ -121,7 +121,7 @@
             $seatNo = $_POST['seatNo'];
             $userID = $_COOKIE['user_id'];
 
-	    if(!is_numeric($eventID) || !$is_numeric($seatSectionID) || !is_numeric($row) || !is_numeric($seatNo))
+	    if(!is_numeric($eventID) || !is_numeric($seatSectionID) || !is_numeric($row) || !is_numeric($seatNo))
 	    {
 	   	echo "Please check the types of your entries. An error may occur!<br>";
 	    	return;

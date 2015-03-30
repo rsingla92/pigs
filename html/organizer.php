@@ -52,9 +52,9 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         {
 	  // do not check the name of the venue.
 	  if(!is_numeric($_POST['venueID']) || !is_numeric($_POST['basePrice'])
-		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}',$_POST['startTime'])
-		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}',$_POST['endTime']) 
-		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}',$_POST['saleOpenTime']))
+		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}/',$_POST['startTime'])
+		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}/',$_POST['endTime']) 
+		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}/',$_POST['saleOpenTime']))
 	  {
 		echo "Please check the types of your entries! An error may occur!<br>";
 		return;
@@ -107,7 +107,7 @@ echo sprintf("\nOrg: %s\n", $organizerID);
             $userType = $_POST['userType'];
             $venue = $_POST['venueID'];
 	
-	    if(!is_numeric($price) || !$is_numeric($seatsAvailable) || !ctype_alnum($userType) || !is_numeric($venue))
+	    if(!is_numeric($price) || !is_numeric($seatsAvailable) || !ctype_alnum($userType) || !is_numeric($venue))
 	    {
 		echo "Please check the types of your entries! An error may occur!<br>";
 		return;
@@ -157,7 +157,7 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         {
           echo "Event ID: {$_POST['eventID']}.<br>";
 
-	  if( !is_numeric($eventID) )
+	  if( !is_numeric($_POST['eventID']) )
 	  {
 	  	echo "Please check the types of your entries! An error may occur!<br>";
 		return;		
@@ -177,7 +177,7 @@ echo sprintf("\nOrg: %s\n", $organizerID);
         if (isset($_POST['venueID']))
         {
           echo "Venue ID: {$_POST['venueID']}.<br>";
-          if( !is_numeric($venueID) )
+          if( !is_numeric($_POST['venueID']) )
 	  {
 	  	echo "Please check the types of your entries! An error may occur!<br>";
 		return;		
