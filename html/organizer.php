@@ -24,7 +24,8 @@ include 'db.php';
 //cho $organizerID;
 //cho "\n";
 $organizerID = $_COOKIE['organizer_id'];
-echo sprintf("\nOrg: %s\n", $organizerID);
+echo sprintf("\nCurrent Organizer: %s\n", $organizerID);
+echo "<br>";
 
     function get_post_default($k, $default)
     {
@@ -78,15 +79,8 @@ echo sprintf("\nOrg: %s\n", $organizerID);
        
        if (all_set($vals))
        {
-		// do not check the name of the venue or address
-	   if(!ctype_alnum($_POST['city'] || !ctype_alnum($_POST['province'])))
-	   {
-		echo "Please check the types of your entries! An error may occur!<br>";
-		return;
-	   }
-
            echo "Got venue with name {$_POST['name']}, address {$_POST['address']}, city {$_POST['city']}, province {$_POST['province']}.<br>";
-           $q = "INSERT INTO Venue VALUES (SEQ_VENUE.NEXTVAL, '%s', '%s', '%s', '%s')";
+           $q = "INSERT INTO Venue VALUES (SEQ_VENUE.NEXTVAL, '%s', '%s', '%s', '%s', null)";
            $qe = sprintf($q, $_POST['name'], $_POST['address'], $_POST['city'], $_POST['province']);
            echo get_html_table($qe);
        }
@@ -107,14 +101,14 @@ echo sprintf("\nOrg: %s\n", $organizerID);
             $userType = $_POST['userType'];
             $venue = $_POST['venueID'];
 	
-	    if(!is_numeric($price) || !is_numeric($seatsAvailable) || !ctype_alnum($userType) || !is_numeric($venue))
+	    if(!is_numeric($price) || !is_numeric($seats) || !is_numeric($venue))
 	    {
 		echo "Please check the types of your entries! An error may occur!<br>";
 		return;
             }
 
             echo "Got new seating section w/ price {$price}, seats {$seats}. user type {$userType} and venue {$venue}.<br>";
-            $query = 'INSERT INTO SeatingSection_inVenue (sectionID, venueID, additionalPrice, seatsAvailable, sectionSectionType) VALUES (SEQ_SECTION.NEXTVAL, '.$venue.',' . $price.','. $seats.','. $userType.')';
+            $query = 'INSERT INTO SeatingSection_inVenue (sectionID, venueID, additionalPrice, seatsAvailable, seatingSectionType) VALUES (SEQ_SECTION.NEXTVAL, '.$venue.',' . $price.','. $seats.','. $userType.')';
             $result = get_html_table($query);
             echo $result;
         }
@@ -425,6 +419,68 @@ echo sprintf("\nOrg: %s\n", $organizerID);
       echo run_query($q);
     }
 
+    function refreshTicketsToEvent()
+    {
+        if (isset($_POST['eventID']))
+        {
+            // First store current sequence ticket ID
+            $q = "SELECT SEQ_TICKET.NEXTVAL from Ticket_ownsSeat_WithCustomer";
+            $startTIDArr = oci_fetch_array(run_query($q));
+            //echo $startTIDArr;
+
+            foreach ($startTIDArr as $item) {
+                $startTID = ($item !== null ? htmlentities($item, ENT_QUOTES) : "&nbsp;");
+            }
+
+            // opted to NOT delete tickets first, and will assume user is smart and does not have any tickets already created
+            // when they use this function.
+    /*        // Second delete all tickets associated with this event
+            $fmt = "DELETE FROM Ticket_ownsSeat_WithCustomer T, ForAdmissionTo FAT 
+                    WHERE FAT.eventID = %s AND T.ticketID = FAT.ticketID";
+            $q = sprintf($fmt, $_POST['eventID']);
+            run_query($q); */ 
+            
+            // Third create new tickets for a venue
+            $q =   "INSERT INTO Ticket_ownsSeat_WithCustomer
+                    SELECT SEQ_TICKET.NEXTVAL, NULL, 't', SIS.sectionID, SIS.venueID, SIS.seat_row, SIS.seatNo
+                    FROM SeatingSection_inVenue SSIV, Seat_inSection SIS, Venue V                
+                    WHERE V.venueID = SSIV.venueID AND SSIV.venueID = SIS.venueID AND SSIV.sectionID = SIS.sectionID";
+            run_query($q);
+
+            // Finally, repopulate ForAdmissionTo
+
+            $fmt = "INSERT INTO ForAdmissionTo
+                    SELECT %s, ticketID 
+                    FROM Ticket_ownsSeat_WithCustomer
+                    WHERE ticketID >= $startTID";
+            $q = sprintf($fmt, $_POST['eventID']);
+            run_query($q);
+
+            echo "Refreshed tickets successfully for eventID: {_POST['eventID']}"; 
+            echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
+        }
+        else
+        {
+            echo "Invalid parameters.<br>";
+        }
+    }
+
+    function changeBasePrice()
+    {
+        if (isset($_POST['eventID']) && isset($_POST['basePrice']))
+        {
+          echo "Event ID: {$_POST['eventID']}. New base price: {$_POST['basePrice']}<br>";
+          $fmt = "UPDATE Event_atVenue SET basePrice = %s WHERE eventID = %s";
+          $q = sprintf($fmt, $_POST['basePrice'], $_POST['eventID']);
+          get_html_table($q);
+          echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
+        }
+        else
+        {
+            echo "Invalid parameters.<br>";
+        }
+    }
+
     function find_superfans()
     {
       echo "Fans";
@@ -453,9 +509,9 @@ echo sprintf("\nOrg: %s\n", $organizerID);
     }
 
     $action_num = intval(get_post_default('action', '0'));
-    if ($action_num >= 1 && $action_num <= 18)
+    if ($action_num >= 1 && $action_num <= 20)
     {
-        echo "Action num: {$action_num}.<br>";
+        //echo "Action num: {$action_num}.<br>";
         switch ($action_num)
         {
             case 1:
@@ -510,11 +566,16 @@ echo sprintf("\nOrg: %s\n", $organizerID);
                 delete_account();
                 break;
             case 18:
+                refreshTicketsToEvent();
+                break;
+            case 19:
+                changeBasePrice();
+            case 20:
                 find_superfans();
                 break;
             default:
                 echo "Invalid operation.<br>";
-                echo "Click <a href=\"Customer.html\">here<//a> to go back to the main page.";
+                echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
                 break;
         }
     }

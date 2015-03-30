@@ -228,10 +228,32 @@
 			<p></p>
 		</li>
 		<form method="post" action="organizer.php">
-      <input type="hidden" name="action" value="18">	
+      <input type="hidden" name="action" value="20">	
       Event Name:<br>
       <input type="text" name="eventName"><input type="submit" value="Submit">
 
+		</form>
+
+        <li class="section_break">
+			<h3>Refresh Tickets for Event at given Venue</h3>
+			<p></p>
+		</li>
+		<form method="post" action="organizer.php">
+            This will delete all tickets to the event, and create available tickets to the event for every seat in its venue.<br>
+			Event (ID): <br> <input type="text" name="eventID"><br>
+		        <input type="hidden" name="action" value="18">	
+			<input type="submit" value="Refresh">
+		</form>
+
+        <li class="section_break">
+			<h3>Update base price for an event</h3>
+			<p></p>
+		</li>
+        <form method="post" action="organizer.php">
+			Event (ID): <br> <input type="text" name="eventID"><br>
+			New Base Price: <br> <input type="text" name="basePrice"><br>
+		        <input type="hidden" name="action" value="19">	
+			<input type="submit" value="Update">
 		</form>
 		
 		<br><br><a href="login.html">logout</a>

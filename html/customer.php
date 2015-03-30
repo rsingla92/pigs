@@ -26,24 +26,14 @@
     {
         $eventCity = get_post_default('eventCity', ' '); 
         $eventName = get_post_default('eventName', ' ');
-        $eventYear = get_post_default('eventYear', ' ');
-        $eventMonth = get_post_default('eventMonth', '');
 
-	// do not check event name	
-	if(!ctype_alnum($eventCity) && !is_numeric($eventYear) && !is_numeric($eventMonth))
-	{
-	    echo "Please check the types of your entries. An error may occur!<br>";
-	    return;
-	}
-	
         $query = "SELECT E.eventID, E.venueID, E.eventName, E.basePrice, V.name, V.cityName, E.startTime 
                   FROM Event_atVenue E, venue V 
                   WHERE E.venueID = V.venueID AND 
                   (V.cityName LIKE '{$eventCity}' 
-                   OR E.eventName LIKE '{$eventName}'
-                   OR (EXTRACT (YEAR FROM E.startTime ) = {$eventYear} AND EXTRACT (MONTH FROM E.startTime) = {$eventMonth}))";
+                   OR E.eventName LIKE '{$eventName}')";
 
-	echo "Results for events named {$eventName} on the month of {$eventMonth}, {$eventYear} in the city of {$eventCity}:<br>";
+	echo "Results for events:<br>";
 	echo get_html_table($query);
 	echo "Click <a href=\"customer.html\">here<//a> to go back to the main page.";
     }
@@ -222,7 +212,7 @@
     {
         echo "Deleted user {$_COOKIE['login_user']}.<br>";
 	$username = $_COOKIE['login_user'];
-        $query = 'DELETE FROM Organizer WHERE username = ' . $username;
+        $query = "DELETE FROM Organizer WHERE username = '" . $username . "'";
         $result = get_html_table($query); 
  	
 	unset($_COOKIE['login_user']);
