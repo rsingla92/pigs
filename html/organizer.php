@@ -53,9 +53,9 @@ echo "<br>";
         {
 	  // do not check the name of the venue.
 	  if(!is_numeric($_POST['venueID']) || !is_numeric($_POST['basePrice'])
-		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}',$_POST['startTime'])
-		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}',$_POST['endTime']) 
-		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}',$_POST['saleOpenTime']))
+		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}/',$_POST['startTime'])
+		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}/',$_POST['endTime']) 
+		|| !preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}/',$_POST['saleOpenTime']))
 	  {
 		echo "Please check the types of your entries! An error may occur!<br>";
 		return;
@@ -79,15 +79,8 @@ echo "<br>";
        
        if (all_set($vals))
        {
-		// do not check the name of the venue or address
-	   if(!ctype_alnum($_POST['city'] || !ctype_alnum($_POST['province'])))
-	   {
-		echo "Please check the types of your entries! An error may occur!<br>";
-		return;
-	   }
-
            echo "Got venue with name {$_POST['name']}, address {$_POST['address']}, city {$_POST['city']}, province {$_POST['province']}.<br>";
-           $q = "INSERT INTO Venue VALUES (SEQ_VENUE.NEXTVAL, '%s', '%s', '%s', '%s')";
+           $q = "INSERT INTO Venue VALUES (SEQ_VENUE.NEXTVAL, '%s', '%s', '%s', '%s', null)";
            $qe = sprintf($q, $_POST['name'], $_POST['address'], $_POST['city'], $_POST['province']);
            echo get_html_table($qe);
        }
@@ -108,14 +101,14 @@ echo "<br>";
             $userType = $_POST['userType'];
             $venue = $_POST['venueID'];
 	
-	    if(!is_numeric($price) || !$is_numeric($seatsAvailable) || !ctype_alnum($userType) || !is_numeric($venue))
+	    if(!is_numeric($price) || !is_numeric($seats) || !is_numeric($venue))
 	    {
 		echo "Please check the types of your entries! An error may occur!<br>";
 		return;
             }
 
             echo "Got new seating section w/ price {$price}, seats {$seats}. user type {$userType} and venue {$venue}.<br>";
-            $query = 'INSERT INTO SeatingSection_inVenue (sectionID, venueID, additionalPrice, seatsAvailable, sectionSectionType) VALUES (SEQ_SECTION.NEXTVAL, '.$venue.',' . $price.','. $seats.','. $userType.')';
+            $query = 'INSERT INTO SeatingSection_inVenue (sectionID, venueID, additionalPrice, seatsAvailable, seatingSectionType) VALUES (SEQ_SECTION.NEXTVAL, '.$venue.',' . $price.','. $seats.','. $userType.')';
             $result = get_html_table($query);
             echo $result;
         }
@@ -158,7 +151,7 @@ echo "<br>";
         {
           echo "Event ID: {$_POST['eventID']}.<br>";
 
-	  if( !is_numeric($eventID) )
+	  if( !is_numeric($_POST['eventID']) )
 	  {
 	  	echo "Please check the types of your entries! An error may occur!<br>";
 		return;		
@@ -178,7 +171,7 @@ echo "<br>";
         if (isset($_POST['venueID']))
         {
           echo "Venue ID: {$_POST['venueID']}.<br>";
-          if( !is_numeric($venueID) )
+          if( !is_numeric($_POST['venueID']) )
 	  {
 	  	echo "Please check the types of your entries! An error may occur!<br>";
 		return;		

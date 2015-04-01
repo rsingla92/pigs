@@ -27,13 +27,6 @@
         $eventCity = get_post_default('eventCity', ' '); 
         $eventName = get_post_default('eventName', ' ');
 
-	    // do not check event name	
-	    if(!ctype_alnum($eventCity))
-	    {
-	        echo "Please check the types of your entries. An error may occur!<br>";
-	        return;
-	    }
-	
         $query = "SELECT E.eventID, E.venueID, E.eventName, E.basePrice, V.name, V.cityName, E.startTime 
                   FROM Event_atVenue E, venue V 
                   WHERE E.venueID = V.venueID AND 
@@ -118,7 +111,7 @@
             $seatNo = $_POST['seatNo'];
             $userID = $_COOKIE['user_id'];
 
-	    if(!is_numeric($eventID) || !$is_numeric($seatSectionID) || !is_numeric($row) || !is_numeric($seatNo))
+	    if(!is_numeric($eventID) || !is_numeric($seatSectionID) || !is_numeric($row) || !is_numeric($seatNo))
 	    {
 	   	echo "Please check the types of your entries. An error may occur!<br>";
 	    	return;
@@ -219,7 +212,7 @@
     {
         echo "Deleted user {$_COOKIE['login_user']}.<br>";
 	$username = $_COOKIE['login_user'];
-        $query = 'DELETE FROM Organizer WHERE username = ' . $username;
+        $query = "DELETE FROM Organizer WHERE username = '" . $username . "'";
         $result = get_html_table($query); 
  	
 	unset($_COOKIE['login_user']);
